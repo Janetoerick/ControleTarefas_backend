@@ -2,6 +2,7 @@ package com.project.tarefas.model;
 
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -22,7 +23,7 @@ public class TaskGroup {
 	
 	private String title;
 	
-	@OneToMany(mappedBy = "taskgroup", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "taskGroup", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Task> tasks;
 	
 	@ManyToOne

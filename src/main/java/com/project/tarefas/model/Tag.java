@@ -21,7 +21,7 @@ public class Tag {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	private String title;
+	private String label;
 	
 	private String color;
 	
@@ -31,9 +31,9 @@ public class Tag {
 	inverseJoinColumns = @JoinColumn(name = "task_id"))
 	private Set<Task> tasks;
 
-	public Tag(String title, String color) {
+	public Tag(String label, String color) {
 		super();
-		this.title = title;
+		this.label = label;
 		this.color = color;
 	}
 
@@ -45,12 +45,12 @@ public class Tag {
 		this.id = id;
 	}
 
-	public String getTitle() {
-		return title;
+	public String getLabel() {
+		return label;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 	public String getColor() {

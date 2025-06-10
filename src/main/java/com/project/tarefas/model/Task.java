@@ -37,7 +37,7 @@ public class Task {
 	
 	private Date date_finish;
 	
-	@ManyToOne
+	@ManyToOne(optional = false)
 	@JoinColumn(name = "dashboard_id")
 	private Dashboard dashboard;
 	
@@ -50,7 +50,7 @@ public class Task {
 	@OneToMany(mappedBy = "task", fetch = FetchType.LAZY)
 	private Set<Comment> comments;
 	
-	@ManyToOne
+	@ManyToOne(optional = false)
 	@JoinColumn(name = "taskgroup_id")
 	private TaskGroup taskGroup;
 	
