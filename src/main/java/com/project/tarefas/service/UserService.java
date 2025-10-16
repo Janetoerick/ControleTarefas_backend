@@ -1,11 +1,18 @@
 package com.project.tarefas.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.project.tarefas.DTO.PasswordChangeDTO;
+import com.project.tarefas.DTO.UserLoginDTO;
+import com.project.tarefas.DTO.UserRegistrationDTO;
+import com.project.tarefas.DTO.UserResponseDTO;
+import com.project.tarefas.exception.InvalidPasswordException;
+import com.project.tarefas.exception.UserNotFoundException;
 import com.project.tarefas.model.User;
-import com.project.tarefas.model.DTO.UserRegistrationDTO;
+import com.project.tarefas.mapper.UserMapper;
 import com.project.tarefas.repository.UserRepository;
 
 @Service
@@ -18,7 +25,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User registerUser(UserRegistrationDTO registrationDTO) {
+    public UserResponseDTO registerUser(UserRegistrationDTO registrationDTO) {
         if (userRepository.existsByUsername(registrationDTO.getUsername())) {
             throw new RuntimeException("Username already exists");
         }
@@ -33,6 +40,53 @@ public class UserService {
         user.setName(registrationDTO.getName());
         user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
         
-        return userRepository.save(user);
+        userRepository.save(user);
+        
+        return UserMapper.INSTANCE.toResponseDTO(user);
     }
+    
+    public void changePassword(Long userId, PasswordChangeDTO changeDTO) throws UserNotFoundException, InvalidPasswordException {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (!passwordEncoder.matches(changeDTO.getCurrentPassword(), user.getPassword())) {
+            throw new InvalidPasswordException("Current password is incorrect");
+        }
+
+        if (changeDTO.getNewPassword().equals(changeDTO.getCurrentPassword())) {
+            throw new InvalidPasswordException("New password must be different from current");
+        }
+
+        if (!changeDTO.getNewPassword().equals(changeDTO.getConfirmation())) {
+            throw new InvalidPasswordException("New password and confirmation don't match");
+        }
+
+        user.setPassword(passwordEncoder.encode(changeDTO.getNewPassword()));
+        userRepository.save(user);
+    }
+    
+    public UserResponseDTO loginUser(UserLoginDTO userLogin) throws UserNotFoundException, InvalidPasswordException {
+    	User user = userRepository.findByUsername(userLogin.getUsername())
+    			.orElseThrow(() -> new UserNotFoundException("User not exist"));
+    	
+    	if (!passwordEncoder.matches(userLogin.getPassword(), user.getPassword())) {
+    		throw new InvalidPasswordException("Current password is incorrect");
+    	}
+    	
+    	return UserMapper.INSTANCE.toResponseDTO(user);
+    }
+    
+    public UserResponseDTO findUserById(Long id) throws UserNotFoundException {
+    	User user = userRepository.findById(id)
+    			.orElseThrow(() -> new UserNotFoundException("User not exist"));
+    	
+    	return UserMapper.INSTANCE.toResponseDTO(user);
+    }
+    
+    public List<UserResponseDTO> findUserAll() {
+    	List<User> users = userRepository.findAll();
+    	
+    	return UserMapper.INSTANCE.toResponseDTOList(users);
+    }
+    
 }

@@ -1,6 +1,7 @@
-package com.project.tarefas.model.DTO;
+package com.project.tarefas.DTO;
 
 public class UserRegistrationDTO {
+	
     private String username;
     private String email;
     private String password;
