@@ -10,8 +10,6 @@ import com.project.tarefas.model.User;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     // Converte User para UserResponseDTO
     UserResponseDTO toResponseDTO(User user);

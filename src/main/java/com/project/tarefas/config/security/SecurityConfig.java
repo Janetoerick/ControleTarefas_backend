@@ -20,6 +20,7 @@ public class SecurityConfig {
          .authorizeHttpRequests(auth -> auth
              .requestMatchers("/api/auth/**").permitAll()
              .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
+             .requestMatchers("/api/user/**").permitAll() // PERMITE ACESSO TOTAL PARA TESTES
              .anyRequest().authenticated()
          )
          .sessionManagement(session -> session

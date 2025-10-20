@@ -52,7 +52,7 @@ public class UserController {
     }
     
     @GetMapping("/users/{userId}")
-    public ResponseEntity<UserResponseDTO> findUserById(@PathVariable Long userId) throws UserNotFoundException {
+    public ResponseEntity<UserResponseDTO> findUserById(@PathVariable("userId") Long userId) throws UserNotFoundException {
     	UserResponseDTO users = userService.findUserById(userId);
     	
     	return ResponseEntity.ok(users);

@@ -2,6 +2,7 @@ package com.project.tarefas.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,9 @@ import com.project.tarefas.repository.UserRepository;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private UserMapper userMapper;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -42,7 +46,7 @@ public class UserService {
         
         userRepository.save(user);
         
-        return UserMapper.INSTANCE.toResponseDTO(user);
+        return userMapper.toResponseDTO(user);
     }
     
     public void changePassword(Long userId, PasswordChangeDTO changeDTO) throws UserNotFoundException, InvalidPasswordException {
@@ -73,20 +77,20 @@ public class UserService {
     		throw new InvalidPasswordException("Current password is incorrect");
     	}
     	
-    	return UserMapper.INSTANCE.toResponseDTO(user);
+    	return userMapper.toResponseDTO(user);
     }
     
     public UserResponseDTO findUserById(Long id) throws UserNotFoundException {
     	User user = userRepository.findById(id)
     			.orElseThrow(() -> new UserNotFoundException("User not exist"));
     	
-    	return UserMapper.INSTANCE.toResponseDTO(user);
+    	return userMapper.toResponseDTO(user);
     }
     
     public List<UserResponseDTO> findUserAll() {
     	List<User> users = userRepository.findAll();
     	
-    	return UserMapper.INSTANCE.toResponseDTOList(users);
+    	return userMapper.toResponseDTOList(users);
     }
     
 }
