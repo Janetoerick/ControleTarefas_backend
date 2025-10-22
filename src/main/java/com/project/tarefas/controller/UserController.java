@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.tarefas.DTO.LoginResponseDTO;
 import com.project.tarefas.DTO.PasswordChangeDTO;
 import com.project.tarefas.DTO.UserLoginDTO;
 import com.project.tarefas.DTO.UserRegistrationDTO;
@@ -28,15 +29,8 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
-
     
-    @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> registerUser(@RequestBody UserRegistrationDTO registrationDTO) {
-    	UserResponseDTO newUser = userService.registerUser(registrationDTO);
-        return ResponseEntity.ok(newUser);
-    }
-    
-    @PatchMapping("/users/{userId}/password")
+    @PatchMapping("/{userId}/password")
     public ResponseEntity<Void> changePassword(
         @PathVariable Long userId,
         @RequestBody PasswordChangeDTO passwordChangeDTO) throws UserNotFoundException, InvalidPasswordException {
@@ -45,17 +39,11 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
     
-    @PostMapping("/login")
-    public ResponseEntity<UserResponseDTO> loginUser(@RequestBody UserLoginDTO loginDTO) throws UserNotFoundException, InvalidPasswordException {
-    	UserResponseDTO user = userService.loginUser(loginDTO);
-    	return ResponseEntity.ok(user);
-    }
-    
-    @GetMapping("/users/{userId}")
+    @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDTO> findUserById(@PathVariable("userId") Long userId) throws UserNotFoundException {
-    	UserResponseDTO users = userService.findUserById(userId);
+    	UserResponseDTO user = userService.findUserById(userId);
     	
-    	return ResponseEntity.ok(users);
+    	return ResponseEntity.ok(user);
     }
     
     @GetMapping("/users")

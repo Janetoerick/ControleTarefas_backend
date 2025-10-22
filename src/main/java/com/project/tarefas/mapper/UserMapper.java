@@ -3,7 +3,6 @@ package com.project.tarefas.mapper;
 import java.util.List;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
 import com.project.tarefas.DTO.UserResponseDTO;
 import com.project.tarefas.model.User;

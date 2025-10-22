@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.project.tarefas.DTO.LoginResponseDTO;
 import com.project.tarefas.DTO.PasswordChangeDTO;
 import com.project.tarefas.DTO.UserLoginDTO;
 import com.project.tarefas.DTO.UserRegistrationDTO;
@@ -23,10 +24,30 @@ public class UserService {
     
     @Autowired
     private UserMapper userMapper;
+    
+    @Autowired
+    private JwtService jwtService;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+    
+    public LoginResponseDTO loginUser(UserLoginDTO userLogin) throws UserNotFoundException, InvalidPasswordException {
+    	User user = userRepository.findByUsername(userLogin.getUsername())
+    			.orElseThrow(() -> new UserNotFoundException("User not exist"));
+    	
+    	if (!passwordEncoder.matches(userLogin.getPassword(), user.getPassword())) {
+    		throw new InvalidPasswordException("Current password is incorrect");
+    	}
+    	
+    	String token = jwtService.generateToken(user);
+    	
+    	return new LoginResponseDTO(
+                token,
+                user.getId(),
+                user.getUsername()
+            );
     }
 
     public UserResponseDTO registerUser(UserRegistrationDTO registrationDTO) {
@@ -67,17 +88,6 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(changeDTO.getNewPassword()));
         userRepository.save(user);
-    }
-    
-    public UserResponseDTO loginUser(UserLoginDTO userLogin) throws UserNotFoundException, InvalidPasswordException {
-    	User user = userRepository.findByUsername(userLogin.getUsername())
-    			.orElseThrow(() -> new UserNotFoundException("User not exist"));
-    	
-    	if (!passwordEncoder.matches(userLogin.getPassword(), user.getPassword())) {
-    		throw new InvalidPasswordException("Current password is incorrect");
-    	}
-    	
-    	return userMapper.toResponseDTO(user);
     }
     
     public UserResponseDTO findUserById(Long id) throws UserNotFoundException {
