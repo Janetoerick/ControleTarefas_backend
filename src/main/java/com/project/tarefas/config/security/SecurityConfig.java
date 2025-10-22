@@ -13,7 +13,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.project.tarefas.repository.UserRepository;
-import com.project.tarefas.DTO.SecurityUserDetails;
 
 @Configuration
 @EnableWebSecurity

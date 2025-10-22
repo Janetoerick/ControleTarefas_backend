@@ -11,6 +11,7 @@ import com.project.tarefas.DTO.PasswordChangeDTO;
 import com.project.tarefas.DTO.UserLoginDTO;
 import com.project.tarefas.DTO.UserRegistrationDTO;
 import com.project.tarefas.DTO.UserResponseDTO;
+import com.project.tarefas.exception.InvalidConfirmationException;
 import com.project.tarefas.exception.InvalidPasswordException;
 import com.project.tarefas.exception.UserNotFoundException;
 import com.project.tarefas.model.User;
@@ -19,18 +20,17 @@ import com.project.tarefas.repository.UserRepository;
 
 @Service
 public class UserService {
+	
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    
-    @Autowired
     private UserMapper userMapper;
-    
-    @Autowired
     private JwtService jwtService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userMapper = userMapper;
+        this.jwtService = jwtService;
     }
     
     public LoginResponseDTO loginUser(UserLoginDTO userLogin) throws UserNotFoundException, InvalidPasswordException {
@@ -70,7 +70,7 @@ public class UserService {
         return userMapper.toResponseDTO(user);
     }
     
-    public void changePassword(Long userId, PasswordChangeDTO changeDTO) throws UserNotFoundException, InvalidPasswordException {
+    public void changePassword(Long userId, PasswordChangeDTO changeDTO) throws UserNotFoundException, InvalidPasswordException, InvalidConfirmationException {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException("User not found"));
 
@@ -83,10 +83,12 @@ public class UserService {
         }
 
         if (!changeDTO.getNewPassword().equals(changeDTO.getConfirmation())) {
-            throw new InvalidPasswordException("New password and confirmation don't match");
+            throw new InvalidConfirmationException("New password and confirmation don't match");
         }
 
-        user.setPassword(passwordEncoder.encode(changeDTO.getNewPassword()));
+        String newEncodedPassword = passwordEncoder.encode(changeDTO.getNewPassword());
+        user.setPassword(newEncodedPassword);
+        
         userRepository.save(user);
     }
     

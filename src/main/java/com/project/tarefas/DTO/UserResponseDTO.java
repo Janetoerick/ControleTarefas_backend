@@ -2,12 +2,12 @@ package com.project.tarefas.DTO;
 
 public class UserResponseDTO {
 	
-	private Integer id;
+	private Long id;
 	private String username;
     private String email;
     private String name;
     
-	public UserResponseDTO(Integer id, String username, String email, String name) {
+	public UserResponseDTO(Long id, String username, String email, String name) {
 		super();
 		this.id = id;
 		this.username = username;
@@ -15,10 +15,10 @@ public class UserResponseDTO {
 		this.name = name;
 	}
 	
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	public String getUsername() {

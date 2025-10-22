@@ -16,6 +16,7 @@ import com.project.tarefas.DTO.PasswordChangeDTO;
 import com.project.tarefas.DTO.UserLoginDTO;
 import com.project.tarefas.DTO.UserRegistrationDTO;
 import com.project.tarefas.DTO.UserResponseDTO;
+import com.project.tarefas.exception.InvalidConfirmationException;
 import com.project.tarefas.exception.InvalidPasswordException;
 import com.project.tarefas.exception.UserNotFoundException;
 import com.project.tarefas.service.UserService;
@@ -33,7 +34,7 @@ public class UserController {
     @PatchMapping("/{userId}/password")
     public ResponseEntity<Void> changePassword(
         @PathVariable Long userId,
-        @RequestBody PasswordChangeDTO passwordChangeDTO) throws UserNotFoundException, InvalidPasswordException {
+        @RequestBody PasswordChangeDTO passwordChangeDTO) throws UserNotFoundException, InvalidPasswordException, InvalidConfirmationException {
         
         userService.changePassword(userId, passwordChangeDTO);
         return ResponseEntity.noContent().build();
