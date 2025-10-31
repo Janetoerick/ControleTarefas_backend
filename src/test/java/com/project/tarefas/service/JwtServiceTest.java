@@ -81,7 +81,6 @@ class JwtServiceTest {
      User userEntidadeDiferente = new User(2L, "DifferentUser", "other@mail.com", "otherHash", "ROLE_USER");
      UserDetails userDiferenteAdaptado = new SecurityUserDetails(userEntidadeDiferente);
 
-     System.out.println("Esta no 2");
      // ACT & ASSERT
      assertFalse(jwtService.isTokenValid(token, userDiferenteAdaptado));
  }
