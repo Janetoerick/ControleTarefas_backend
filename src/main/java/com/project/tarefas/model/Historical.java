@@ -18,7 +18,7 @@ public class Historical {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 	
 	@OneToOne
     @JoinColumn(name = "dashboard_id", referencedColumnName = "id")
@@ -32,11 +32,11 @@ public class Historical {
 		this.dashboard = dashboard;
 	}
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
