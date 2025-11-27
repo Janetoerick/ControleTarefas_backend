@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 
 import com.project.tarefas.exception.InvalidTitleException;
 import com.project.tarefas.exception.UserNotFoundException;
+import com.project.tarefas.mapper.DashboardMapper;
+import com.project.tarefas.DTO.DashboardResponseDTO;
 import com.project.tarefas.exception.DashboardInvalidException;
 import com.project.tarefas.model.Dashboard;
 import com.project.tarefas.model.User;
@@ -15,14 +17,16 @@ public class DashboardService {
 
 	private final DashboardRepository dashboardRepository;
 	private final UserRepository userRepository;
+	private DashboardMapper dashboardMapper;
 
-	public DashboardService(DashboardRepository dashboardRepository, UserRepository userRepository) {
+	public DashboardService(DashboardRepository dashboardRepository, UserRepository userRepository, DashboardMapper dashboardMapper) {
 		super();
 		this.dashboardRepository = dashboardRepository;
 		this.userRepository = userRepository;
+		this.dashboardMapper = dashboardMapper;
 	}
 	
-	public Dashboard createDashboard(String title, Long user) throws UserNotFoundException {
+	public DashboardResponseDTO createDashboard(String title, Long user) throws UserNotFoundException {
 		if(title.isEmpty() || title.contains("_")) {
 			new InvalidTitleException();
 		}
@@ -33,7 +37,8 @@ public class DashboardService {
 		Dashboard new_dashboard = new Dashboard(title, user_all);
 		
 		dashboardRepository.save(new_dashboard);
-		return new_dashboard;
+		
+		return dashboardMapper.toResponseDTO(new_dashboard);
 	}
 	
 	public void deleteDashboard(Long user, Long dashboard) throws UserNotFoundException, DashboardInvalidException {
@@ -48,7 +53,7 @@ public class DashboardService {
 		dashboardRepository.delete(dashboard_all);
 	}
 	
-	public Dashboard editTitle(Long dashboard, Long user, String title) throws UserNotFoundException, DashboardInvalidException{
+	public DashboardResponseDTO editTitle(Long dashboard, Long user, String title) throws UserNotFoundException, DashboardInvalidException{
 		if(title.isEmpty() || title.contains("_")) {
 			new InvalidTitleException();
 		}
@@ -61,8 +66,9 @@ public class DashboardService {
 		}
 		
 		dashboard_edit.setTitle(title);
+		dashboardRepository.save(dashboard_edit);
 		
-		return dashboardRepository.save(dashboard_edit);
+		return dashboardMapper.toResponseDTO(dashboard_edit);
 	}
 	
 }
