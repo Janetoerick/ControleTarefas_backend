@@ -1,5 +1,7 @@
 package com.project.tarefas.mapper;
 
+import java.util.Set;
+
 import org.mapstruct.Mapper;
 
 import com.project.tarefas.DTO.DashboardResponseDTO;
@@ -9,4 +11,6 @@ import com.project.tarefas.model.Dashboard;
 public interface DashboardMapper {
 
 	DashboardResponseDTO toResponseDTO(Dashboard dashboard);
+	
+	Set<DashboardResponseDTO> toResponseAllDTO(Set<Dashboard> dashboards);
 }

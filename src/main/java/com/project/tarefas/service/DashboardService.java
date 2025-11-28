@@ -1,5 +1,9 @@
 package com.project.tarefas.service;
 
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+
 import org.springframework.stereotype.Service;
 
 import com.project.tarefas.exception.InvalidTitleException;
@@ -69,6 +73,27 @@ public class DashboardService {
 		dashboardRepository.save(dashboard_edit);
 		
 		return dashboardMapper.toResponseDTO(dashboard_edit);
+	}
+	
+	public DashboardResponseDTO findDashboardById(Long id) throws DashboardInvalidException {
+		Dashboard dashboard = dashboardRepository.findById(id)
+				.orElseThrow(() -> new DashboardInvalidException("Dashboard não existe..."));
+		
+		return dashboardMapper.toResponseDTO(dashboard);
+	}
+	
+	public Set<DashboardResponseDTO> findAllDashboardByUser(Long id) throws UserNotFoundException  {
+		
+		User user_all = userRepository.findById(id)
+				.orElseThrow(() -> new UserNotFoundException("Usuário não encontrado..."));
+		
+		Set<Dashboard> dashboards = dashboardRepository.findByUser(user_all);
+		
+		if(dashboards.isEmpty()) {
+			return Collections.emptySet();
+		}
+		
+		return dashboardMapper.toResponseAllDTO(dashboards);
 	}
 	
 }
