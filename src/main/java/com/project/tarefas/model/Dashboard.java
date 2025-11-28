@@ -45,21 +45,18 @@ public class Dashboard {
 	@OneToOne(mappedBy = "dashboard", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private Historical historical;
 	
-	public Dashboard(String title, Set<Task> tasks, User user) {
+	public Dashboard(String title, User user) {
 		super();
 		this.title = title;
-		this.tasks = tasks;
 		this.user = user;
-	}
-	
-	public Dashboard(String title, Set<Task> tasks, User user, Set<User> team) {
-		super();
-		this.title = title;
-		this.tasks = tasks;
-		this.user = user;
-		this.team = team;
 	}
 
+	public Dashboard(Long id, String title, User user) {
+		super();
+		this.id = id;
+		this.title = title;
+		this.user = user;
+	}
 
 
 	public Long getId() {
