@@ -51,6 +51,13 @@ public class Dashboard {
 		this.user = user;
 	}
 
+	public Dashboard(Long id, String title, User user) {
+		super();
+		this.id = id;
+		this.title = title;
+		this.user = user;
+	}
+
 
 	public Long getId() {
 		return id;

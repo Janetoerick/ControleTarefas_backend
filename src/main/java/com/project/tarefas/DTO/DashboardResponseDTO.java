@@ -34,6 +34,15 @@ public class DashboardResponseDTO {
 		this.historical = historical;
 	}
 
+	public DashboardResponseDTO(Long id, String title, Long user) {
+		super();
+		this.id = id;
+		this.title = title;
+		this.user = user;
+	}
+
+
+
 	public Long getId() {
 		return id;
 	}

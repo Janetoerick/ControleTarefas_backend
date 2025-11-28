@@ -48,25 +48,25 @@ public class DashboardService {
 				.orElseThrow(() -> new DashboardNotFoundException("Dashboard não existe..."));
 		
 		if(dashboard_all.getUser().getId() != user) {
-			new AccessDeniedException();
+			throw new AccessDeniedException();
 		}
 		
 		dashboardRepository.delete(dashboard_all);
 	}
 	
-	public DashboardResponseDTO editTitle(Long dashboard, Long user, String title) throws AccessDeniedException, DashboardNotFoundException{
+	public DashboardResponseDTO editTitle(Long dashboard, Long user, String title) throws AccessDeniedException, DashboardNotFoundException {
 		
 		Dashboard dashboard_edit = dashboardRepository.findById(dashboard)
 				.orElseThrow(() -> new DashboardNotFoundException("Dashboard não existe..."));
 		
 		if(dashboard_edit.getUser().getId() != user) {
-			new AccessDeniedException();
+			throw new AccessDeniedException();
 		}
 		
 		dashboard_edit.setTitle(title);
-		dashboardRepository.save(dashboard_edit);
+		Dashboard savedDashboard = dashboardRepository.save(dashboard_edit);
 		
-		return dashboardMapper.toResponseDTO(dashboard_edit);
+		return dashboardMapper.toResponseDTO(savedDashboard);
 	}
 	
 	public DashboardResponseDTO findDashboardById(Long id) throws DashboardNotFoundException {
