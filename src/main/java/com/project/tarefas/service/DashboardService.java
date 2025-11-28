@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.project.tarefas.exception.UserNotFoundException;
 import com.project.tarefas.mapper.DashboardMapper;
+//import com.project.tarefas.mapper.DashboardMapper;
 import com.project.tarefas.DTO.DashboardTitleDTO;
 import com.project.tarefas.DTO.DashboardResponseDTO;
 import com.project.tarefas.exception.AccessDeniedException;
@@ -16,7 +17,7 @@ import com.project.tarefas.model.User;
 import com.project.tarefas.repository.DashboardRepository;
 import com.project.tarefas.repository.UserRepository;
 
-@Service
+@Service 
 public class DashboardService {
 
 	private final DashboardRepository dashboardRepository;

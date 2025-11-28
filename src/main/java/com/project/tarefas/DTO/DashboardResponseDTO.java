@@ -5,6 +5,7 @@ import java.util.Set;
 import com.project.tarefas.model.Task;
 import com.project.tarefas.model.TaskGroup;
 
+
 public class DashboardResponseDTO {
 
 	private Long id;
@@ -21,6 +22,9 @@ public class DashboardResponseDTO {
 	
     private Long historical;
     
+	public DashboardResponseDTO() {
+		super();
+	}
 
 	public DashboardResponseDTO(Long id, String title, Set<Task> tasks, Long user, Set<TaskGroup> taskgroups,
 			Set<Long> team, Long historical) {
