@@ -10,6 +10,8 @@ import org.mapstruct.Mapping;
 import com.project.tarefas.DTO.TaskResponseDTO;
 import com.project.tarefas.model.Tag;
 import com.project.tarefas.model.Task;
+import com.project.tarefas.model.enums.Priority;
+import com.project.tarefas.model.enums.StatusTask;
 
 @Mapper(componentModel = "spring")
 public interface TaskMapper {
@@ -25,5 +27,14 @@ public interface TaskMapper {
         return tags.stream()
                    .map(Tag::getId)
                    .collect(Collectors.toSet());
+    }
+
+    // Conversores de Enum para String para o ResponseDTO
+    default String map(StatusTask status) {
+        return status != null ? status.name() : null;
+    }
+
+    default String map(Priority priority) {
+        return priority != null ? priority.name() : null;
     }
 }

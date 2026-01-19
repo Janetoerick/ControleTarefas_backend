@@ -128,4 +128,43 @@ public class TaskService {
 
         taskRepository.delete(task);
     }
+
+    // Método para atualizar apenas o STATUS
+    public TaskResponseDTO updateTaskStatus(Long userId, Long taskId, String statusName) throws TaskNotFoundException, AccessDeniedException {
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new TaskNotFoundException());
+        
+        validateOwner(task, userId);
+
+        try {
+            task.setStatus(StatusTask.valueOf(statusName.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Status inválido: " + statusName);
+        }
+
+        return taskMapper.toResponseDTO(taskRepository.save(task));
+    }
+
+    // Método para atualizar apenas a PRIORIDADE
+    public TaskResponseDTO updateTaskPriority(Long userId, Long taskId, String priorityName) throws TaskNotFoundException, AccessDeniedException {
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new TaskNotFoundException());
+        
+        validateOwner(task, userId);
+
+        try {
+            task.setPriority(Priority.valueOf(priorityName.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Prioridade inválida: " + priorityName);
+        }
+
+        return taskMapper.toResponseDTO(taskRepository.save(task));
+    }
+
+    // Validação de segurança: o usuário é o dono do dashboard da tarefa?
+    private void validateOwner(Task task, Long userId) throws AccessDeniedException {
+        if (!task.getDashboard().getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("Você não tem permissão para alterar esta tarefa.");
+        }
+    }
 }
