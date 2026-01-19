@@ -2,6 +2,9 @@ package com.project.tarefas.service;
 
 import java.nio.file.AccessDeniedException;
 import java.sql.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,6 +56,7 @@ public class TaskService {
     }
 
 
+    // Método para criar uma Task
     public TaskResponseDTO createTask(Long userId, Long dashboardId, TaskCreateDTO dto) throws DashboardNotFoundException, AccessDeniedException {
         // 1. Validar Dashboard
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
@@ -94,6 +98,7 @@ public class TaskService {
         return taskMapper.toResponseDTO(savedTask);
     }
 
+    // Método para adicionar uma Tag na Task
     public TaskResponseDTO addTagToTask(Long userId, Long taskId, Long tagId) throws TaskNotFoundException, AccessDeniedException, TagNotFoundException {
         // Busca a tarefa
         Task task = taskRepository.findById(taskId)
@@ -118,6 +123,7 @@ public class TaskService {
         return taskMapper.toResponseDTO(taskRepository.save(task));
     }
 
+    // Método para exlucir uma Tag da Task
     public TaskResponseDTO removeTagFromTask(Long userId, Long taskId, Long tagId) throws TaskNotFoundException, TagNotFoundException, AccessDeniedException {
         // 1. Busca a tarefa
         Task task = taskRepository.findById(taskId)
@@ -145,6 +151,7 @@ public class TaskService {
         return taskMapper.toResponseDTO(taskRepository.save(task));
     }
 
+    // Método para excluir uma Task
     public void deleteTask(Long userId, Long taskId) throws TaskNotFoundException, AccessDeniedException {
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
@@ -188,6 +195,7 @@ public class TaskService {
         return taskMapper.toResponseDTO(taskRepository.save(task));
     }
 
+    // Método para mover uma Task para outro grupo
     public TaskResponseDTO moveTaskToGroup(Long userId, Long taskId, Long newGroupId) throws TaskNotFoundException, AccessDeniedException {
         // 1. Busca a tarefa e valida o dono
         Task task = taskRepository.findById(taskId)
@@ -209,6 +217,32 @@ public class TaskService {
 
         // 5. Salva e retorna o DTO
         return taskMapper.toResponseDTO(taskRepository.save(task));
+    }
+
+    // Método para atualizar apenas a PRIORIDADE
+    public List<TaskResponseDTO> getTasksByGroup(Long userId, Long taskGroupId) throws AccessDeniedException {
+        TaskGroup group = taskGroupRepository.findById(taskGroupId)
+            .orElseThrow(() -> new EntityNotFoundException("Grupo de tarefas não encontrado."));
+
+        // Validação de segurança: o grupo pertence a um dashboard do usuário?
+        if (!group.getDashboard().getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("Acesso negado aos dados deste grupo.");
+        }
+
+        List<Task> tasks = taskRepository.findByTaskGroupId(taskGroupId);
+        return tasks.stream()
+                    .map(taskMapper::toResponseDTO)
+                    .collect(Collectors.toList());
+    }
+
+    public TaskResponseDTO getTaskById(Long userId, Long taskId) throws TaskNotFoundException, AccessDeniedException {
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new TaskNotFoundException());
+
+        // Validação de segurança
+        validateOwner(task, userId);
+
+        return taskMapper.toResponseDTO(task);
     }
 
     // Validação de segurança: o usuário é o dono do dashboard da tarefa?
