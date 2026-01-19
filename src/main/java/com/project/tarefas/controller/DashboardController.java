@@ -32,6 +32,10 @@ public class DashboardController {
 		this.dashboardService = dashboardService;
 	}
 	
+	/**
+     * Cria um novo dashboard.
+     * @throws UserNotFoundException 
+     */
 	@PostMapping("/user/{userId}")
     public ResponseEntity<DashboardResponseDTO> createDashboard(
         @PathVariable Long userId,
@@ -42,6 +46,11 @@ public class DashboardController {
         return ResponseEntity.ok(response);
     }
 	
+	/**
+     * Deleta um dashboard.
+     * @throws AccessDeniedException 
+	 * @throws DashboardNotFoundException 
+     */
 	@DeleteMapping("/user/{userId}/{dashboardId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)  // Retorna 204 para exclusão bem-sucedida
 	public void deleteDashboard(
@@ -52,6 +61,11 @@ public class DashboardController {
 		dashboardService.deleteDashboard(userId, dashboardId);
 	}
 	
+	/**
+     * Edita o titulo de um dashboard.
+     * @throws AccessDeniedException 
+	 * @throws DashboardNotFoundException 
+     */
 	@PatchMapping("/user/{userId}/{dashboardId}/title")
 	public DashboardResponseDTO editDashboardTitle(
 	        @PathVariable Long userId, 
@@ -66,6 +80,10 @@ public class DashboardController {
         );
     }
 
+	/**
+     * Acha um dashboard pelo id.
+	 * @throws DashboardNotFoundException 
+     */
 	@GetMapping("/{id}")
 	public DashboardResponseDTO findDashboardById(
 			@PathVariable Long id
@@ -74,6 +92,10 @@ public class DashboardController {
 		return dashboardService.findDashboardById(id);
 	}
 	
+	/**
+     * Acha todos os dashboards com o id do criador.
+     * @throws UserNotFoundException 
+     */
 	@GetMapping("/user/{userId}")
 	public Set<DashboardResponseDTO> findDashboardByUserId(
 			@PathVariable Long userId

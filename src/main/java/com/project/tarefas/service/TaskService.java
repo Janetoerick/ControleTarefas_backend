@@ -118,6 +118,33 @@ public class TaskService {
         return taskMapper.toResponseDTO(taskRepository.save(task));
     }
 
+    public TaskResponseDTO removeTagFromTask(Long userId, Long taskId, Long tagId) throws TaskNotFoundException, TagNotFoundException, AccessDeniedException {
+        // 1. Busca a tarefa
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new TaskNotFoundException());
+
+        // 2. Validação de Segurança: O utilizador é dono do dashboard desta tarefa?
+        // Reutilizando a lógica de validação de posse
+        if (!task.getDashboard().getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("Acesso negado.");
+        }
+
+        // 3. Busca a etiqueta
+        Tag tag = tagRepository.findById(tagId)
+            .orElseThrow(() -> new TagNotFoundException());
+
+        // 4. Remove a etiqueta da coleção da tarefa
+        // O Hibernate tratará de remover o registo na tabela intermédia 'task_tag'
+        if (task.getTags().contains(tag)) {
+            task.getTags().remove(tag);
+        } else {
+            throw new IllegalArgumentException("Esta etiqueta não está associada a esta tarefa.");
+        }
+
+        // 5. Salva a alteração e retorna o DTO mapeado
+        return taskMapper.toResponseDTO(taskRepository.save(task));
+    }
+
     public void deleteTask(Long userId, Long taskId) throws TaskNotFoundException, AccessDeniedException {
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
@@ -158,6 +185,29 @@ public class TaskService {
             throw new IllegalArgumentException("Prioridade inválida: " + priorityName);
         }
 
+        return taskMapper.toResponseDTO(taskRepository.save(task));
+    }
+
+    public TaskResponseDTO moveTaskToGroup(Long userId, Long taskId, Long newGroupId) throws TaskNotFoundException, AccessDeniedException {
+        // 1. Busca a tarefa e valida o dono
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new TaskNotFoundException());
+        
+        validateOwner(task, userId);
+
+        // 2. Busca o novo grupo (coluna)
+        TaskGroup newGroup = taskGroupRepository.findById(newGroupId)
+            .orElseThrow(() -> new EntityNotFoundException("Grupo de tarefas não encontrado."));
+
+        // 3. VALIDAÇÃO DE ESCOPO: O novo grupo pertence ao dashboard da tarefa?
+        if (!newGroup.getDashboard().getId().equals(task.getDashboard().getId())) {
+            throw new IllegalArgumentException("O grupo de destino deve pertencer ao mesmo dashboard da tarefa.");
+        }
+
+        // 4. Atualiza a associação
+        task.setTaskGroup(newGroup);
+
+        // 5. Salva e retorna o DTO
         return taskMapper.toResponseDTO(taskRepository.save(task));
     }
 

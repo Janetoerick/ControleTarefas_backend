@@ -31,6 +31,12 @@ public class UserController {
         this.userService = userService;
     }
     
+    /**
+     * Muda a senha do usuario.
+     * @throws UserNotFoundException 
+     * @throws InvalidPasswordException 
+     * @throws InvalidConfirmationException 
+     */
     @PatchMapping("/{userId}/password")
     public ResponseEntity<Void> changePassword(
         @PathVariable Long userId,
@@ -40,6 +46,10 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
     
+    /**
+     * Achar o usuario atraves do Id
+     * @throws UserNotFoundException 
+     */
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDTO> findUserById(@PathVariable("userId") Long userId) throws UserNotFoundException {
     	UserResponseDTO user = userService.findUserById(userId);
@@ -47,6 +57,9 @@ public class UserController {
     	return ResponseEntity.ok(user);
     }
     
+    /**
+     * Pega todos os usuarios do sistema.
+     */
     @GetMapping("/users")
     public ResponseEntity<List<UserResponseDTO>> findUserAll() {
     	List<UserResponseDTO> users = userService.findUserAll();
