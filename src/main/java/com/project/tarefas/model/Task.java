@@ -60,6 +60,9 @@ public class Task {
 	@Enumerated(EnumType.STRING)
 	private Priority priority;
 
+	public Task() {
+	}
+
 	public Task(String title, String description, Date date_init, Date date_finish) {
 		super();
 		this.title = title;

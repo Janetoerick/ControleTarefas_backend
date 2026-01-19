@@ -28,6 +28,9 @@ public class Dashboard {
 	
 	@OneToMany(mappedBy = "dashboard", fetch = FetchType.LAZY)
 	private Set<Task> tasks;
+
+	@OneToMany(mappedBy = "dashboard")
+	private Set<Tag> tags;
 	
 	@ManyToOne
 	@JoinColumn(name = "user_id")
@@ -83,6 +86,14 @@ public class Dashboard {
 		this.tasks = tasks;
 	}
 
+	public Set<Tag> getTags() {
+		return tags;
+	}
+
+	public void setTags(Set<Tag> tags) {
+		this.tags = tags;
+	}
+
 	public User getUser() {
 		return user;
 	}
@@ -114,6 +125,8 @@ public class Dashboard {
 	public void setHistorical(Historical historical) {
 		this.historical = historical;
 	}
+
+	
 	
 	
 }

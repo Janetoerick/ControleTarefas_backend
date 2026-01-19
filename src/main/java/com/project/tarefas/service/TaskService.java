@@ -1,0 +1,131 @@
+package com.project.tarefas.service;
+
+import java.nio.file.AccessDeniedException;
+import java.sql.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.project.tarefas.DTO.TaskCreateDTO;
+import com.project.tarefas.DTO.TaskResponseDTO;
+import com.project.tarefas.exception.DashboardNotFoundException;
+import com.project.tarefas.exception.TagNotFoundException;
+import com.project.tarefas.exception.TaskNotFoundException;
+import com.project.tarefas.mapper.TaskMapper;
+import com.project.tarefas.model.Dashboard;
+import com.project.tarefas.model.Tag;
+import com.project.tarefas.model.Task;
+import com.project.tarefas.model.TaskGroup;
+import com.project.tarefas.model.enums.Priority;
+import com.project.tarefas.model.enums.StatusTask;
+import com.project.tarefas.repository.DashboardRepository;
+import com.project.tarefas.repository.TagRepository;
+import com.project.tarefas.repository.TaskGroupRepository;
+import com.project.tarefas.repository.TaskRepository;
+
+import jakarta.persistence.EntityNotFoundException;
+
+@Service
+public class TaskService {
+    
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private TaskGroupRepository taskGroupRepository;
+
+    @Autowired
+    private TagRepository tagRepository;
+
+    @Autowired
+    private DashboardRepository dashboardRepository;
+
+    @Autowired
+    private TaskMapper taskMapper;
+
+    public TaskService(TaskRepository taskRepository, TaskGroupRepository taskGroupRepository,
+            TagRepository tagRepository, DashboardRepository dashboardRepository, TaskMapper taskMapper) {
+        this.taskRepository = taskRepository;
+        this.taskGroupRepository = taskGroupRepository;
+        this.tagRepository = tagRepository;
+        this.dashboardRepository = dashboardRepository;
+        this.taskMapper = taskMapper;
+    }
+
+
+    public TaskResponseDTO createTask(Long userId, Long dashboardId, TaskCreateDTO dto) throws DashboardNotFoundException, AccessDeniedException {
+        // 1. Validar Dashboard
+        Dashboard dashboard = dashboardRepository.findById(dashboardId)
+            .orElseThrow(() -> new DashboardNotFoundException("Dashboard não encontrado."));
+
+        // 2. Validar Posse (Security)
+        if (!dashboard.getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("Usuário não autorizado a criar tarefas neste dashboard.");
+        }
+
+        // 3. Validar TaskGroup (A lista onde a tarefa será inserida)
+        TaskGroup group = taskGroupRepository.findById(dto.getTaskGroupId())
+            .orElseThrow(() -> new EntityNotFoundException("Grupo de tarefas não encontrado."));
+        
+        // Verificação de segurança extra: o grupo pertence a este dashboard?
+        if (!group.getDashboard().getId().equals(dashboardId)) {
+            throw new IllegalArgumentException("O grupo de tarefas não pertence a este dashboard.");
+        }
+
+        // 4. Instanciar e Preencher a Entidade Task
+        Task task = new Task();
+        task.setTitle(dto.getTitle());
+        task.setDescription(dto.getDescription());
+        task.setDate_init(dto.getDate_init());
+        task.setDate_finish(dto.getDate_finish());
+        task.setDashboard(dashboard);
+        task.setTaskGroup(group);
+        
+        // Definir valores padrão iniciais (Enums da sua classe Task)
+        task.setStatus(StatusTask.PENDENTE); // Exemplo de status inicial
+        
+        // Converter prioridade de String (DTO) para Enum (Entidade)
+        if (dto.getPriority() != null) {
+            task.setPriority(Priority.valueOf(dto.getPriority().toUpperCase()));
+        }
+
+        // 5. Salvar e Mapear para Resposta
+        Task savedTask = taskRepository.save(task);
+        return taskMapper.toResponseDTO(savedTask);
+    }
+
+    public TaskResponseDTO addTagToTask(Long userId, Long taskId, Long tagId) throws TaskNotFoundException, AccessDeniedException, TagNotFoundException {
+        // Busca a tarefa
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new TaskNotFoundException());
+
+        // Validação de Posse: O usuário é dono do dashboard desta tarefa?
+        if (!task.getDashboard().getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("Acesso negado.");
+        }
+
+        // Busca a tag
+        Tag tag = tagRepository.findById(tagId)
+            .orElseThrow(() -> new TagNotFoundException());
+
+        // VALIDAÇÃO DE ESCOPO: A tag pertence ao mesmo dashboard da tarefa?
+        if (!tag.getDashboard().getId().equals(task.getDashboard().getId())) {
+            throw new IllegalArgumentException("A tag selecionada não pertence a este dashboard.");
+        }
+
+        // Adiciona e salva
+        task.getTags().add(tag);
+        return taskMapper.toResponseDTO(taskRepository.save(task));
+    }
+
+    public void deleteTask(Long userId, Long taskId) throws TaskNotFoundException, AccessDeniedException {
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new TaskNotFoundException());
+
+        if (!task.getDashboard().getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("Sem permissão para deletar.");
+        }
+
+        taskRepository.delete(task);
+    }
+}

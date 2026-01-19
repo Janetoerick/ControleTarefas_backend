@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -31,10 +32,15 @@ public class Tag {
 	inverseJoinColumns = @JoinColumn(name = "task_id"))
 	private Set<Task> tasks;
 
-	public Tag(String label, String color) {
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "dashboard_id")
+	private Dashboard dashboard;
+
+	public Tag(String label, String color, Dashboard dashboard) {
 		super();
 		this.label = label;
 		this.color = color;
+		this.dashboard = dashboard;
 	}
 
 	public Long getId() {
@@ -69,5 +75,11 @@ public class Tag {
 		this.tasks = tasks;
 	}
 	
-	
+	public Dashboard getDashboard() {
+		return dashboard;
+	}
+
+	public void setDashboard(Dashboard dashboard) {
+		this.dashboard = dashboard;
+	}
 }
