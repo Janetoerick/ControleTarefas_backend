@@ -48,6 +48,9 @@ public class Dashboard {
 	@OneToOne(mappedBy = "dashboard", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private Historical historical;
 	
+	public Dashboard() {
+	}
+
 	public Dashboard(String title, User user) {
 		super();
 		this.title = title;

@@ -1,6 +1,5 @@
 package com.project.tarefas.controller;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Set;
 
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.tarefas.DTO.TaskCreateDTO;
 import com.project.tarefas.DTO.TaskResponseDTO;
+import com.project.tarefas.exception.AccessDeniedException;
 import com.project.tarefas.exception.DashboardNotFoundException;
 import com.project.tarefas.exception.TagNotFoundException;
 import com.project.tarefas.exception.TaskNotFoundException;

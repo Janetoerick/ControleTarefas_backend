@@ -30,6 +30,9 @@ public class TaskGroup {
 	@JoinColumn(name = "dashboard_id")
 	private Dashboard dashboard;
 
+	public TaskGroup() {
+	}
+
 	public TaskGroup(String title, Dashboard dashboard) {
 		super();
 		this.title = title;

@@ -32,6 +32,17 @@ public class TaskResponseDTO {
         this.taskGroupId = taskGroupId;
     }
 
+    public TaskResponseDTO(Long id, String title, String description,
+            Long dashboardId, Long taskGroupId, StatusTask status, Priority priority) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.dashboardId = dashboardId;
+        this.taskGroupId = taskGroupId;
+        this.status = status;
+        this.priority = priority;
+    }
+
     public TaskResponseDTO(Long id, String title, String description, Date date_init, Date date_finish,
             Long dashboardId, Set<Long> tags, Long taskGroupId, StatusTask status, Priority priority) {
         this.id = id;

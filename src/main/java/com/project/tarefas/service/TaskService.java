@@ -1,6 +1,5 @@
 package com.project.tarefas.service;
 
-import java.nio.file.AccessDeniedException;
 import java.sql.Date;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.project.tarefas.DTO.TaskCreateDTO;
 import com.project.tarefas.DTO.TaskResponseDTO;
+import com.project.tarefas.exception.AccessDeniedException;
 import com.project.tarefas.exception.DashboardNotFoundException;
 import com.project.tarefas.exception.TagNotFoundException;
 import com.project.tarefas.exception.TaskNotFoundException;
@@ -64,7 +64,7 @@ public class TaskService {
 
         // 2. Validar Posse (Security)
         if (!dashboard.getUser().getId().equals(userId)) {
-            throw new AccessDeniedException("Usuário não autorizado a criar tarefas neste dashboard.");
+            throw new AccessDeniedException();
         }
 
         // 3. Validar TaskGroup (A lista onde a tarefa será inserida)
@@ -106,7 +106,7 @@ public class TaskService {
 
         // Validação de Posse: O usuário é dono do dashboard desta tarefa?
         if (!task.getDashboard().getUser().getId().equals(userId)) {
-            throw new AccessDeniedException("Acesso negado.");
+            throw new AccessDeniedException();
         }
 
         // Busca a tag
@@ -132,7 +132,7 @@ public class TaskService {
         // 2. Validação de Segurança: O utilizador é dono do dashboard desta tarefa?
         // Reutilizando a lógica de validação de posse
         if (!task.getDashboard().getUser().getId().equals(userId)) {
-            throw new AccessDeniedException("Acesso negado.");
+            throw new AccessDeniedException();
         }
 
         // 3. Busca a etiqueta
@@ -157,7 +157,7 @@ public class TaskService {
             .orElseThrow(() -> new TaskNotFoundException());
 
         if (!task.getDashboard().getUser().getId().equals(userId)) {
-            throw new AccessDeniedException("Sem permissão para deletar.");
+            throw new AccessDeniedException();
         }
 
         taskRepository.delete(task);
@@ -226,7 +226,7 @@ public class TaskService {
 
         // Validação de segurança: o grupo pertence a um dashboard do usuário?
         if (!group.getDashboard().getUser().getId().equals(userId)) {
-            throw new AccessDeniedException("Acesso negado aos dados deste grupo.");
+            throw new AccessDeniedException();
         }
 
         List<Task> tasks = taskRepository.findByTaskGroupId(taskGroupId);
@@ -248,7 +248,7 @@ public class TaskService {
     // Validação de segurança: o usuário é o dono do dashboard da tarefa?
     private void validateOwner(Task task, Long userId) throws AccessDeniedException {
         if (!task.getDashboard().getUser().getId().equals(userId)) {
-            throw new AccessDeniedException("Você não tem permissão para alterar esta tarefa.");
+            throw new AccessDeniedException();
         }
     }
 }

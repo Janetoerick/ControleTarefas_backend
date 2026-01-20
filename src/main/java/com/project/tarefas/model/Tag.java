@@ -36,6 +36,9 @@ public class Tag {
 	@JoinColumn(name = "dashboard_id")
 	private Dashboard dashboard;
 
+	public Tag() {
+	}
+
 	public Tag(String label, String color, Dashboard dashboard) {
 		super();
 		this.label = label;
