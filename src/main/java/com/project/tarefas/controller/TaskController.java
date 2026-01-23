@@ -97,12 +97,13 @@ public class TaskController {
      * Adiciona a tag na tarefa
      * @throws TaskNotFoundException 
      * @throws AccessDeniedException 
+     * @throws DashboardNotFoundException 
      */
     @PostMapping("/{taskId}/tags/{tagId}")
     public ResponseEntity<TaskResponseDTO> addTag(
             @PathVariable Long taskId,
             @PathVariable Long tagId,
-            @AuthenticationPrincipal User user) throws AccessDeniedException, TaskNotFoundException, TagNotFoundException {
+            @AuthenticationPrincipal User user) throws AccessDeniedException, TaskNotFoundException, TagNotFoundException, DashboardNotFoundException {
         return ResponseEntity.ok(taskService.addTagToTask(user.getId(), taskId, tagId));
     }
 
@@ -111,12 +112,13 @@ public class TaskController {
      * @throws TagNotFoundException 
      * @throws TaskNotFoundException 
      * @throws AccessDeniedException 
+     * @throws DashboardNotFoundException 
      */
     @DeleteMapping("/{taskId}/tags/{tagId}")
     public ResponseEntity<TaskResponseDTO> removeTag(
             @PathVariable Long taskId,
             @PathVariable Long tagId,
-            @AuthenticationPrincipal User user) throws AccessDeniedException, TaskNotFoundException, TagNotFoundException {
+            @AuthenticationPrincipal User user) throws AccessDeniedException, TaskNotFoundException, TagNotFoundException, DashboardNotFoundException {
         // Implementaremos este no Service a seguir, se desejar
         return ResponseEntity.ok(taskService.removeTagFromTask(user.getId(), taskId, tagId));
     }

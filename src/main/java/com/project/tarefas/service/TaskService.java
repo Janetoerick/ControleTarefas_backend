@@ -62,10 +62,7 @@ public class TaskService {
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
             .orElseThrow(() -> new DashboardNotFoundException("Dashboard não encontrado."));
 
-        // 2. Validar Posse (Security)
-        if (!dashboard.getUser().getId().equals(userId)) {
-            throw new AccessDeniedException();
-        }
+        validateAccess(dashboard, userId);
 
         // 3. Validar TaskGroup (A lista onde a tarefa será inserida)
         TaskGroup group = taskGroupRepository.findById(dto.getTaskGroupId())
@@ -99,15 +96,13 @@ public class TaskService {
     }
 
     // Método para adicionar uma Tag na Task
-    public TaskResponseDTO addTagToTask(Long userId, Long taskId, Long tagId) throws TaskNotFoundException, AccessDeniedException, TagNotFoundException {
+    public TaskResponseDTO addTagToTask(Long userId, Long taskId, Long tagId) throws TaskNotFoundException, AccessDeniedException, TagNotFoundException, DashboardNotFoundException {
         // Busca a tarefa
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
 
-        // Validação de Posse: O usuário é dono do dashboard desta tarefa?
-        if (!task.getDashboard().getUser().getId().equals(userId)) {
-            throw new AccessDeniedException();
-        }
+        // 2. Validação de Segurança: O utilizador é dono ou do time do dashboard desta tarefa?
+        validateAccess(task, userId);
 
         // Busca a tag
         Tag tag = tagRepository.findById(tagId)
@@ -124,16 +119,13 @@ public class TaskService {
     }
 
     // Método para exlucir uma Tag da Task
-    public TaskResponseDTO removeTagFromTask(Long userId, Long taskId, Long tagId) throws TaskNotFoundException, TagNotFoundException, AccessDeniedException {
+    public TaskResponseDTO removeTagFromTask(Long userId, Long taskId, Long tagId) throws TaskNotFoundException, TagNotFoundException, AccessDeniedException, DashboardNotFoundException {
         // 1. Busca a tarefa
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
 
-        // 2. Validação de Segurança: O utilizador é dono do dashboard desta tarefa?
-        // Reutilizando a lógica de validação de posse
-        if (!task.getDashboard().getUser().getId().equals(userId)) {
-            throw new AccessDeniedException();
-        }
+        // 2. Validação de Segurança: O utilizador é dono ou do time do dashboard desta tarefa?
+        validateAccess(task, userId);
 
         // 3. Busca a etiqueta
         Tag tag = tagRepository.findById(tagId)
@@ -156,9 +148,8 @@ public class TaskService {
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
 
-        if (!task.getDashboard().getUser().getId().equals(userId)) {
-            throw new AccessDeniedException();
-        }
+        // Verifica se o dono do dashboard que esta tentando excluir
+        validateOwner(task, userId);
 
         taskRepository.delete(task);
     }
@@ -168,7 +159,7 @@ public class TaskService {
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
         
-        validateOwner(task, userId);
+        validateAccess(task, userId);
 
         try {
             task.setStatus(StatusTask.valueOf(statusName.toUpperCase()));
@@ -184,7 +175,7 @@ public class TaskService {
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
         
-        validateOwner(task, userId);
+        validateAccess(task, userId);
 
         try {
             task.setPriority(Priority.valueOf(priorityName.toUpperCase()));
@@ -201,7 +192,7 @@ public class TaskService {
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
         
-        validateOwner(task, userId);
+        validateAccess(task, userId);
 
         // 2. Busca o novo grupo (coluna)
         TaskGroup newGroup = taskGroupRepository.findById(newGroupId)
@@ -225,9 +216,7 @@ public class TaskService {
             .orElseThrow(() -> new EntityNotFoundException("Grupo de tarefas não encontrado."));
 
         // Validação de segurança: o grupo pertence a um dashboard do usuário?
-        if (!group.getDashboard().getUser().getId().equals(userId)) {
-            throw new AccessDeniedException();
-        }
+        validateAccess(group.getDashboard(), userId);
 
         List<Task> tasks = taskRepository.findByTaskGroupId(taskGroupId);
         return tasks.stream()
@@ -240,7 +229,7 @@ public class TaskService {
             .orElseThrow(() -> new TaskNotFoundException());
 
         // Validação de segurança
-        validateOwner(task, userId);
+        validateAccess(task, userId);
 
         return taskMapper.toResponseDTO(task);
     }
@@ -248,6 +237,32 @@ public class TaskService {
     // Validação de segurança: o usuário é o dono do dashboard da tarefa?
     private void validateOwner(Task task, Long userId) throws AccessDeniedException {
         if (!task.getDashboard().getUser().getId().equals(userId)) {
+            throw new AccessDeniedException();
+        }
+    }
+
+    private void validateAccess(Dashboard dashboard, Long userId) throws AccessDeniedException {
+        // 1. Verifica se é o dono
+        boolean isOwner = dashboard.getUser().getId().equals(userId);
+        
+        // 2. Verifica se está no time (Set<User> team)
+        boolean isMember = dashboard.getTeam().stream()
+                .anyMatch(user -> user.getId().equals(userId));
+
+        if (!isOwner && !isMember) {
+            throw new AccessDeniedException();
+        }
+    }
+
+    private void validateAccess(Task task, Long userId) throws AccessDeniedException {
+        // 1. Verifica se é o dono
+        boolean isOwner = task.getDashboard().getUser().getId().equals(userId);
+        
+        // 2. Verifica se está no time (Set<User> team)
+        boolean isMember = task.getDashboard().getTeam().stream()
+                .anyMatch(user -> user.getId().equals(userId));
+
+        if (!isOwner && !isMember) {
             throw new AccessDeniedException();
         }
     }
