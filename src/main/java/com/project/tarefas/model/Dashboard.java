@@ -43,7 +43,7 @@ public class Dashboard {
 	@JoinTable(name = "dashboard_user",
 	joinColumns = @JoinColumn(name = "dashboard_id"),
 	inverseJoinColumns = @JoinColumn(name = "user_id"))
-	private Set<User> team;
+	private Set<User> team = new java.util.HashSet<>();
 	
 	@OneToOne(mappedBy = "dashboard", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private Historical historical;

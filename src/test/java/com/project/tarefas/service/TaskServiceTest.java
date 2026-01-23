@@ -63,6 +63,7 @@ public class TaskServiceTest {
         dashboard = new Dashboard();
         dashboard.setId(10L);
         dashboard.setUser(user);
+        dashboard.setTeam(new java.util.HashSet<>());
 
         taskGroup = new TaskGroup();
         taskGroup.setId(20L);

@@ -246,8 +246,8 @@ public class TaskService {
         boolean isOwner = dashboard.getUser().getId().equals(userId);
         
         // 2. Verifica se está no time (Set<User> team)
-        boolean isMember = dashboard.getTeam().stream()
-                .anyMatch(user -> user.getId().equals(userId));
+        boolean isMember = dashboard.getTeam() != null && dashboard.getTeam().stream()
+            .anyMatch(u -> u.getId().equals(userId));
 
         if (!isOwner && !isMember) {
             throw new AccessDeniedException();
@@ -259,8 +259,8 @@ public class TaskService {
         boolean isOwner = task.getDashboard().getUser().getId().equals(userId);
         
         // 2. Verifica se está no time (Set<User> team)
-        boolean isMember = task.getDashboard().getTeam().stream()
-                .anyMatch(user -> user.getId().equals(userId));
+        boolean isMember = task.getDashboard().getTeam() != null && task.getDashboard().getTeam().stream()
+            .anyMatch(u -> u.getId().equals(userId));
 
         if (!isOwner && !isMember) {
             throw new AccessDeniedException();
