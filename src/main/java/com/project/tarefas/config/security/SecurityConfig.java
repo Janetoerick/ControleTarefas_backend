@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.project.tarefas.model.User;
 import com.project.tarefas.repository.UserRepository;
 
 @Configuration
@@ -31,7 +32,7 @@ public class SecurityConfig {
          .authorizeHttpRequests(auth -> auth
              .requestMatchers("/api/auth/**").permitAll()
              .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-            .requestMatchers("/api/user/**").permitAll() // PERMITE ACESSO TOTAL PARA TESTES
+             .requestMatchers("/api/**").permitAll() // PERMITE ACESSO TOTAL PARA TESTES
              .anyRequest().authenticated()
          )
          .sessionManagement(session -> session
@@ -49,8 +50,12 @@ public class SecurityConfig {
     
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsername(username)
-                .map(SecurityUserDetails::new) 
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        return username -> {
+            User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+            
+            // Use o seu arquivo que já existe!
+            return new SecurityUserDetails(user);
+        };
     }
 }

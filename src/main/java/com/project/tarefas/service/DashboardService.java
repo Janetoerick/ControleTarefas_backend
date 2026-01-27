@@ -31,6 +31,7 @@ public class DashboardService {
 		this.dashboardMapper = dashboardMapper;
 	}
 	
+	// Cria um novo Dashboard
 	public DashboardResponseDTO createDashboard(Long user, DashboardTitleDTO dto) throws UserNotFoundException {
 		
 		User user_all = userRepository.findById(user)
@@ -43,6 +44,7 @@ public class DashboardService {
 		return dashboardMapper.toResponseDTO(new_dashboard);
 	}
 	
+	// Deleta um novo Dashboard
 	public void deleteDashboard(Long user, Long dashboard) throws AccessDeniedException, DashboardNotFoundException {
 		
 		Dashboard dashboard_all = dashboardRepository.findById(dashboard)
@@ -55,6 +57,7 @@ public class DashboardService {
 		dashboardRepository.delete(dashboard_all);
 	}
 	
+	// Modifica o titulo de um Dashboard existente
 	public DashboardResponseDTO editTitle(Long dashboard, Long user, String title) throws AccessDeniedException, DashboardNotFoundException {
 		
 		Dashboard dashboard_edit = dashboardRepository.findById(dashboard)
@@ -70,6 +73,7 @@ public class DashboardService {
 		return dashboardMapper.toResponseDTO(savedDashboard);
 	}
 	
+	// Retorna um Todas as informacoes de um Dashboard de acordo com o Id
 	public DashboardResponseDTO findDashboardById(Long id) throws DashboardNotFoundException {
 		Dashboard dashboard = dashboardRepository.findById(id)
 				.orElseThrow(() -> new DashboardNotFoundException("Dashboard não existe..."));
@@ -77,6 +81,7 @@ public class DashboardService {
 		return dashboardMapper.toResponseDTO(dashboard);
 	}
 	
+	// Retorna todos os Dashboards que o usuario id seja dono
 	public Set<DashboardResponseDTO> findAllDashboardByUser(Long id) throws UserNotFoundException  {
 		
 		User user_all = userRepository.findById(id)
