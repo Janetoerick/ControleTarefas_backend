@@ -8,6 +8,7 @@ import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import com.project.tarefas.model.User;
@@ -22,9 +23,11 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
+
 	private final String secretKey;
     private final long jwtExpiration;
-	
+
+
 	public JwtService(
 		    @Value("${application.security.jwt.secret-key}") String secretKey,
 		    @Value("${application.security.jwt.expiration}") long jwtExpiration) {
@@ -34,18 +37,28 @@ public class JwtService {
 		}
 	
 	
-	public String generateToken(User user) {
-	    return generateToken((UserDetails) user); 
-	}
+	// public String generateToken(User user) {
+	//     return generateToken((UserDetails) user); 
+	// }
 
-	public String generateToken(UserDetails userDetails) {
+	public String generateToken(User user) {
 	    return Jwts.builder()
 	        .claims(new HashMap<>())
-	        .subject(userDetails.getUsername())
+	        .subject(user.getUsername())
 	        .issuedAt(new Date(System.currentTimeMillis()))
 	        .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
 	        .signWith(getSignInKey())
 	        .compact();
+	}
+
+	public String generateToken(UserDetails userDetails) {
+		return Jwts.builder()
+			.claims(new HashMap<>())
+			.subject(userDetails.getUsername())
+			.issuedAt(new Date(System.currentTimeMillis()))
+			.expiration(new Date(System.currentTimeMillis() + jwtExpiration))
+			.signWith(getSignInKey())
+			.compact();
 	}
 	
 	public String generateToken(Map<String, Object> extraClaims, User user) {
@@ -64,17 +77,8 @@ public class JwtService {
     }
 	
 	public boolean isTokenValid(String token, UserDetails userDetails) {
-	    try {
-	        final String usernameExtraido = extractUsername(token);
-	        
-	        boolean isUsernameValid = usernameExtraido.equals(userDetails.getUsername());
-	        boolean isTokenNotExpired = !isTokenExpired(token);
-	        
-	        return isUsernameValid && isTokenNotExpired;
-	        
-	    } catch (Exception e) {
-	        return false;
-	    }
+		final String username = extractUsername(token);
+		return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
 	}
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {

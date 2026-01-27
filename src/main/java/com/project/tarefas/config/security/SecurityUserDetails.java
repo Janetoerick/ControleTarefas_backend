@@ -19,6 +19,8 @@ public class SecurityUserDetails implements UserDetails {
         this.user = user;
     }
 
+    
+
     // --- Métodos de Autoridade ---
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -58,5 +60,9 @@ public class SecurityUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.tarefas.DTO.TaskCreateDTO;
 import com.project.tarefas.DTO.TaskResponseDTO;
+import com.project.tarefas.config.security.SecurityUserDetails;
 import com.project.tarefas.exception.AccessDeniedException;
 import com.project.tarefas.exception.DashboardNotFoundException;
 import com.project.tarefas.exception.TagNotFoundException;
@@ -36,7 +37,7 @@ public class TaskController {
     private TaskService taskService;
 
     /**
-     * Endpoint para criar uma nova tarefa.
+     * Criar uma nova tarefa.
      * @throws DashboardNotFoundException 
      * @throws AccessDeniedException 
      */
@@ -44,22 +45,22 @@ public class TaskController {
     public ResponseEntity<TaskResponseDTO> create(
             @PathVariable Long dashboardId,
             @RequestBody @Valid TaskCreateDTO taskCreateDTO,
-            @AuthenticationPrincipal User user) throws AccessDeniedException, DashboardNotFoundException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, DashboardNotFoundException {
         
-        TaskResponseDTO response = taskService.createTask(user.getId(), dashboardId, taskCreateDTO);
+        TaskResponseDTO response = taskService.createTask(userDetails.getUser().getId(), dashboardId, taskCreateDTO);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     /**
-     * Endpoint para deletar uma tarefa.
+     * Deletar uma tarefa.
      * @throws TaskNotFoundException 
      * @throws AccessDeniedException 
      */
     @DeleteMapping("/{taskId}")
     public ResponseEntity<Void> delete(
             @PathVariable Long taskId,
-            @AuthenticationPrincipal User user) throws AccessDeniedException, TaskNotFoundException {
-        taskService.deleteTask(user.getId(), taskId);
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException {
+        taskService.deleteTask(userDetails.getUser().getId(), taskId);
         return ResponseEntity.noContent().build();
     }
 
@@ -72,9 +73,9 @@ public class TaskController {
     public ResponseEntity<TaskResponseDTO> updateStatus(
             @PathVariable Long taskId,
             @RequestParam String status,
-            @AuthenticationPrincipal User user) throws AccessDeniedException, TaskNotFoundException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException {
         
-        TaskResponseDTO response = taskService.updateTaskStatus(user.getId(), taskId, status);
+        TaskResponseDTO response = taskService.updateTaskStatus(userDetails.getUser().getId(), taskId, status);
         return ResponseEntity.ok(response);
     }
 
@@ -87,9 +88,9 @@ public class TaskController {
     public ResponseEntity<TaskResponseDTO> updatePriority(
             @PathVariable Long taskId,
             @RequestParam String priority,
-            @AuthenticationPrincipal User user) throws AccessDeniedException, TaskNotFoundException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException {
         
-        TaskResponseDTO response = taskService.updateTaskPriority(user.getId(), taskId, priority);
+        TaskResponseDTO response = taskService.updateTaskPriority(userDetails.getUser().getId(), taskId, priority);
         return ResponseEntity.ok(response);
     }
 
@@ -102,8 +103,8 @@ public class TaskController {
     public ResponseEntity<TaskResponseDTO> addTag(
             @PathVariable Long taskId,
             @PathVariable Long tagId,
-            @AuthenticationPrincipal User user) throws AccessDeniedException, TaskNotFoundException, TagNotFoundException {
-        return ResponseEntity.ok(taskService.addTagToTask(user.getId(), taskId, tagId));
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException, TagNotFoundException {
+        return ResponseEntity.ok(taskService.addTagToTask(userDetails.getUser().getId(), taskId, tagId));
     }
 
     /**
@@ -116,9 +117,9 @@ public class TaskController {
     public ResponseEntity<TaskResponseDTO> removeTag(
             @PathVariable Long taskId,
             @PathVariable Long tagId,
-            @AuthenticationPrincipal User user) throws AccessDeniedException, TaskNotFoundException, TagNotFoundException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException, TagNotFoundException {
         // Implementaremos este no Service a seguir, se desejar
-        return ResponseEntity.ok(taskService.removeTagFromTask(user.getId(), taskId, tagId));
+        return ResponseEntity.ok(taskService.removeTagFromTask(userDetails.getUser().getId(), taskId, tagId));
     }
 
     /**
@@ -130,8 +131,8 @@ public class TaskController {
     public ResponseEntity<TaskResponseDTO> moveTask(
             @PathVariable Long taskId,
             @PathVariable Long newGroupId,
-            @AuthenticationPrincipal User user) throws AccessDeniedException, Throwable {
-        return ResponseEntity.ok(taskService.moveTaskToGroup(user.getId(), taskId, newGroupId));
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, Throwable {
+        return ResponseEntity.ok(taskService.moveTaskToGroup(userDetails.getUser().getId(), taskId, newGroupId));
     }
 
     /**
@@ -142,8 +143,8 @@ public class TaskController {
     @GetMapping("/group/{taskGroupId}")
     public ResponseEntity<List<TaskResponseDTO>> getByGroup(
             @PathVariable Long taskGroupId,
-            @AuthenticationPrincipal User user) throws AccessDeniedException {
-        return ResponseEntity.ok(taskService.getTasksByGroup(user.getId(), taskGroupId));
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException {
+        return ResponseEntity.ok(taskService.getTasksByGroup(userDetails.getUser().getId(), taskGroupId));
     }
 
     /**
@@ -154,7 +155,7 @@ public class TaskController {
     @GetMapping("/{taskId}")
     public ResponseEntity<TaskResponseDTO> getById(
             @PathVariable Long taskId,
-            @AuthenticationPrincipal User user) throws AccessDeniedException, TaskNotFoundException {
-        return ResponseEntity.ok(taskService.getTaskById(user.getId(), taskId));
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException {
+        return ResponseEntity.ok(taskService.getTaskById(userDetails.getUser().getId(), taskId));
     }
 }

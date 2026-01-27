@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.project.tarefas.DTO.TaskGroupCreateDTO;
 import com.project.tarefas.DTO.TaskGroupResponseDTO;
+import com.project.tarefas.config.security.SecurityUserDetails;
 import com.project.tarefas.exception.AccessDeniedException;
 import com.project.tarefas.exception.DashboardNotFoundException;
-import com.project.tarefas.model.User;
 import com.project.tarefas.service.TaskGroupService;
 
 
@@ -37,9 +37,9 @@ public class TaskGroupController {
     public ResponseEntity<TaskGroupResponseDTO> create(
             @PathVariable Long dashboardId,
             @RequestBody @Valid TaskGroupCreateDTO dto,
-            @AuthenticationPrincipal User user) throws AccessDeniedException, DashboardNotFoundException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, DashboardNotFoundException {
         
-        TaskGroupResponseDTO response = taskGroupService.create(user.getId(), dashboardId, dto);
+        TaskGroupResponseDTO response = taskGroupService.create(userDetails.getUser().getId(), dashboardId, dto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -52,9 +52,9 @@ public class TaskGroupController {
     @GetMapping("/dashboard/{dashboardId}")
     public ResponseEntity<List<TaskGroupResponseDTO>> list(
             @PathVariable Long dashboardId,
-            @AuthenticationPrincipal User user) throws AccessDeniedException, DashboardNotFoundException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, DashboardNotFoundException {
         
-        List<TaskGroupResponseDTO> response = taskGroupService.listByDashboard(user.getId(), dashboardId);
+        List<TaskGroupResponseDTO> response = taskGroupService.listByDashboard(userDetails.getUser().getId(), dashboardId);
         return ResponseEntity.ok(response);
     }
 
@@ -66,9 +66,9 @@ public class TaskGroupController {
     public ResponseEntity<TaskGroupResponseDTO> update(
             @PathVariable Long taskGroupId,
             @RequestParam String title,
-            @AuthenticationPrincipal User user) throws AccessDeniedException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException {
         
-        TaskGroupResponseDTO response = taskGroupService.update(user.getId(), taskGroupId, title);
+        TaskGroupResponseDTO response = taskGroupService.update(userDetails.getUser().getId(), taskGroupId, title);
         return ResponseEntity.ok(response);
     }
 
@@ -79,9 +79,9 @@ public class TaskGroupController {
     @DeleteMapping("/{taskGroupId}")
     public ResponseEntity<Void> delete(
             @PathVariable Long taskGroupId,
-            @AuthenticationPrincipal User user) throws AccessDeniedException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException {
         
-        taskGroupService.delete(user.getId(), taskGroupId);
+        taskGroupService.delete(userDetails.getUser().getId(), taskGroupId);
         return ResponseEntity.noContent().build();
     }
 }

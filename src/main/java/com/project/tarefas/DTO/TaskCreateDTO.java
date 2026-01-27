@@ -22,6 +22,12 @@ public class TaskCreateDTO {
     public TaskCreateDTO() {
     }
 
+    public TaskCreateDTO(@NotBlank(message = "O título da tarefa não pode estar vazio") String title,
+            String description, Long taskGroupId) {
+        this.title = title;
+        this.description = description;
+        this.taskGroupId = taskGroupId;
+    }
 
     public TaskCreateDTO(@NotBlank(message = "O título da tarefa não pode estar vazio") String title,
             String description, Long taskGroupId, Date date_init, Date date_finish, String priority) {
