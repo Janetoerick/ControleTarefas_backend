@@ -24,7 +24,7 @@ class JwtServiceTest {
 
  private JwtService jwtService;
  
- private final String SECRET_KEY = "SuaChaveSecretaMuitoLongaEComplexaParaTestes1234567890";
+ private final String SECRET_KEY = "EsseEhUmaChaveSecretaMuitoLongaEComplexaParaTestes1234567890";
  private final long EXPIRATION_TIME_MS = 1000L; // 1 segundo para o teste de expiração
 
  private UserDetails userDetails;

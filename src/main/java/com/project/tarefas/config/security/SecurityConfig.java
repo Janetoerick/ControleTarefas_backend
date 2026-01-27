@@ -54,7 +54,6 @@ public class SecurityConfig {
             User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
             
-            // Use o seu arquivo que já existe!
             return new SecurityUserDetails(user);
         };
     }
