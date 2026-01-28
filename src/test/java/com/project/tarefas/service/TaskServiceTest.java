@@ -80,6 +80,10 @@ public class TaskServiceTest {
         tag.setDashboard(dashboard);
     }
 
+    // =================================================================
+    // TESTES DE CRIAÇÃO
+    // =================================================================
+
     @Nested
     @DisplayName("Testes de Criação de Tarefa")
     class CreateTaskTests {
@@ -113,8 +117,12 @@ public class TaskServiceTest {
         }
     }
 
+    // =================================================================
+    // TESTES DE TAGS
+    // =================================================================
+
     @Nested
-    @DisplayName("Testes de Etiquetas (Tags)")
+    @DisplayName("Testes de Tags")
     class TagTests {
         @Test
         void deveAdicionarTagComSucesso() throws Exception {
@@ -140,6 +148,10 @@ public class TaskServiceTest {
             assertFalse(task.getTags().contains(tag));
         }
     }
+
+    // =================================================================
+    // TESTES DE ATUALIZACOES
+    // =================================================================
 
     @Nested
     @DisplayName("Testes de Atualização")
@@ -169,6 +181,10 @@ public class TaskServiceTest {
             assertEquals(novoGrupo, task.getTaskGroup());
         }
     }
+
+    // =================================================================
+    // TESTES DE BUSCA E DELECAO
+    // =================================================================
 
     @Nested
     @DisplayName("Testes de Busca e Deleção")

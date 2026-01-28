@@ -2,6 +2,7 @@ package com.project.tarefas.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
@@ -63,7 +64,9 @@ class TaskGroupServiceTest {
         createDTO = new TaskGroupCreateDTO("To do");
     }
 
-    // --- TESTES DE CRIAÇÃO (validateStrictOwner) ---
+    // =================================================================
+    // TESTES DE CRIAÇÃO
+    // =================================================================
 
     @Test
     @DisplayName("Deve criar TaskGroup quando o usuário for o dono do dashboard")
@@ -90,7 +93,9 @@ class TaskGroupServiceTest {
         assertThrows(DashboardNotFoundException.class, () -> taskGroupService.create(1L, 99L, createDTO));
     }
 
-    // --- TESTES DE LISTAGEM (validateAccessForView) ---
+    // =================================================================
+    // TESTES DE LISTAGEM
+    // =================================================================
 
     @Test
     @DisplayName("Deve listar grupos para o dono do dashboard")
@@ -119,7 +124,9 @@ class TaskGroupServiceTest {
         assertThrows(AccessDeniedException.class, () -> taskGroupService.listByDashboard(3L, 10L));
     }
 
-    // --- TESTES DE ATUALIZAÇÃO ---
+    // =================================================================
+    // TESTES DE ATUALIZACAO
+    // =================================================================
 
     @Test
     @DisplayName("Deve atualizar nome do grupo com sucesso")
@@ -133,7 +140,9 @@ class TaskGroupServiceTest {
         assertEquals("Doing", taskGroup.getTitle());
     }
 
-    // --- TESTES DE DELEÇÃO ---
+    // =================================================================
+    // TESTES DE DELECAO
+    // =================================================================
 
     @Test
     @DisplayName("Deve deletar grupo se for o dono")

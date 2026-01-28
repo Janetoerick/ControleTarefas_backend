@@ -77,7 +77,9 @@ public class DashboardServiceTest {
         validDashboardDTO = new DashboardResponseDTO(VALID_DASHBOARD_ID, INITIAL_TITLE, VALID_USER_ID);
     }
     
-    // --- TESTES DE CRIAÇÃO (createDashboard) ---
+    // =================================================================
+    // TESTES DE CRIAÇÃO
+    // =================================================================
 
     @Test
     @DisplayName("Deve criar um Dashboard com sucesso quando o usuário for válido")
@@ -113,7 +115,9 @@ public class DashboardServiceTest {
         verify(dashboardRepository, never()).save(any()); // Garante que não houve tentativa de salvar
     }
     
-    // --- TESTES DE BUSCA POR ID (findDashboardById) ---
+    // =================================================================
+    // TESTES DE BUSCA
+    // =================================================================
 
     @Test
     @DisplayName("Deve retornar o DTO quando o Dashboard for encontrado")
@@ -141,8 +145,6 @@ public class DashboardServiceTest {
             dashboardService.findDashboardById(VALID_DASHBOARD_ID)
         );
     }
-    
-    // --- TESTES DE BUSCA DE TODOS POR USUÁRIO (findAllDashboardByUser) ---
     
     @Test
     @DisplayName("Deve retornar Set de DTOs quando o usuário tiver Dashboards")
@@ -190,7 +192,9 @@ public class DashboardServiceTest {
         );
     }
     
-    // --- TESTES DE EXCLUSÃO (deleteDashboard) ---
+    // =================================================================
+    // TESTES DE EXCLUSAO
+    // =================================================================
     
     @Test
     @DisplayName("Deve deletar o Dashboard com sucesso quando o usuário é o dono")
@@ -233,7 +237,9 @@ public class DashboardServiceTest {
         verify(dashboardRepository, never()).deleteById(any());
     }
 
-    // --- TESTES DE EDIÇÃO DE TÍTULO (editTitle) ---
+    // =================================================================
+    // TESTES DE EDICAO
+    // =================================================================
     
     @Test
     @DisplayName("Deve editar o título com sucesso e retornar o DTO atualizado")

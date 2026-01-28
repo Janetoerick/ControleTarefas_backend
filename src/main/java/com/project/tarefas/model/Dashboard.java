@@ -29,7 +29,7 @@ public class Dashboard {
 	@OneToMany(mappedBy = "dashboard", fetch = FetchType.LAZY)
 	private Set<Task> tasks;
 
-	@OneToMany(mappedBy = "dashboard")
+	@OneToMany(mappedBy = "dashboard", orphanRemoval = true)
 	private Set<Tag> tags;
 	
 	@ManyToOne
