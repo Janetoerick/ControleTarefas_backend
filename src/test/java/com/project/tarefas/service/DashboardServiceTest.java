@@ -97,7 +97,7 @@ public class DashboardServiceTest {
 
         // ASSERT
         assertNotNull(result);
-        assertEquals(INITIAL_TITLE, result.getTitle());
+        assertEquals(INITIAL_TITLE, result.title());
         verify(dashboardRepository, times(1)).save(any(Dashboard.class));
     }
 
@@ -131,7 +131,7 @@ public class DashboardServiceTest {
 
         // ASSERT
         assertNotNull(result);
-        assertEquals(VALID_DASHBOARD_ID, result.getId());
+        assertEquals(VALID_DASHBOARD_ID, result.id());
     }
 
     @Test
@@ -257,7 +257,7 @@ public class DashboardServiceTest {
 
         // ASSERT
         assertNotNull(result);
-        assertEquals(NEW_TITLE, result.getTitle());
+        assertEquals(NEW_TITLE, result.title());
         verify(dashboardRepository, times(1)).save(any(Dashboard.class));
     }
 

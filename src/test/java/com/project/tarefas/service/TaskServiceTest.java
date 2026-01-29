@@ -89,10 +89,7 @@ public class TaskServiceTest {
     class CreateTaskTests {
         @Test
         void deveCriarTaskComSucesso() throws Exception {
-            TaskCreateDTO dto = new TaskCreateDTO();
-            dto.setTitle("Título");
-            dto.setTaskGroupId(20L);
-            dto.setPriority("ALTA");
+            TaskCreateDTO dto = new TaskCreateDTO("Título", 20L, "ALTA");
             
             when(dashboardRepository.findById(10L)).thenReturn(Optional.of(dashboard));
             when(taskGroupRepository.findById(20L)).thenReturn(Optional.of(taskGroup));

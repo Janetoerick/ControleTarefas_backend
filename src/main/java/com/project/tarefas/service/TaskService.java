@@ -56,7 +56,7 @@ public class TaskService {
         validateAccess(dashboard, userId);
 
         // Validar TaskGroup (A lista onde a tarefa será inserida)
-        TaskGroup group = taskGroupRepository.findById(dto.getTaskGroupId())
+        TaskGroup group = taskGroupRepository.findById(dto.taskGroupId())
             .orElseThrow(() -> new EntityNotFoundException("Grupo de tarefas não encontrado."));
         
         // Verificação de segurança extra: o grupo pertence a este dashboard?
@@ -66,10 +66,10 @@ public class TaskService {
 
         // Instanciar e Preencher a Entidade Task
         Task task = new Task();
-        task.setTitle(dto.getTitle());
-        task.setDescription(dto.getDescription());
-        task.setDate_init(dto.getDate_init());
-        task.setDate_finish(dto.getDate_finish());
+        task.setTitle(dto.title());
+        task.setDescription(dto.description());
+        task.setDate_init(dto.date_init());
+        task.setDate_finish(dto.date_finish());
         task.setDashboard(dashboard);
         task.setTaskGroup(group);
         
@@ -77,8 +77,8 @@ public class TaskService {
         task.setStatus(StatusTask.PENDENTE);
         
         // Converter prioridade de String (DTO) para Enum (Entidade)
-        if (dto.getPriority() != null) {
-            task.setPriority(Priority.valueOf(dto.getPriority().toUpperCase()));
+        if (dto.priority() != null) {
+            task.setPriority(Priority.valueOf(dto.priority().toUpperCase()));
         }
 
         // Salvar e Mapear para Resposta
