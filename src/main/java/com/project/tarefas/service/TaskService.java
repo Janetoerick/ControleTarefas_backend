@@ -73,15 +73,15 @@ public class TaskService {
         task.setDashboard(dashboard);
         task.setTaskGroup(group);
         
-        // Definir valores padrão iniciais (Enums da sua classe Task)
-        task.setStatus(StatusTask.PENDENTE); // Exemplo de status inicial
+        // Definir valores padrão iniciais
+        task.setStatus(StatusTask.PENDENTE);
         
         // Converter prioridade de String (DTO) para Enum (Entidade)
         if (dto.getPriority() != null) {
             task.setPriority(Priority.valueOf(dto.getPriority().toUpperCase()));
         }
 
-        // 5. Salvar e Mapear para Resposta
+        // Salvar e Mapear para Resposta
         Task savedTask = taskRepository.save(task);
         return taskMapper.toResponseDTO(savedTask);
     }
@@ -92,14 +92,14 @@ public class TaskService {
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
 
-        // 2. Validação de Segurança: O utilizador é dono ou do time do dashboard desta tarefa?
+        // Validação de Segurança
         validateAccess(task, userId);
 
         // Busca a tag
         Tag tag = tagRepository.findById(tagId)
             .orElseThrow(() -> new TagNotFoundException());
 
-        // VALIDAÇÃO DE ESCOPO: A tag pertence ao mesmo dashboard da tarefa?
+        // VALIDAÇÃO DE ESCOPO: A tag pertence ao mesmo dashboard da tarefa
         if (!tag.getDashboard().getId().equals(task.getDashboard().getId())) {
             throw new IllegalArgumentException("A tag selecionada não pertence a este dashboard.");
         }
@@ -111,11 +111,11 @@ public class TaskService {
 
     // Método para exlucir uma Tag da Task
     public TaskResponseDTO removeTagFromTask(Long userId, Long taskId, Long tagId) throws TaskNotFoundException, TagNotFoundException, AccessDeniedException, DashboardNotFoundException {
-        // 1. Busca a tarefa
+        // Busca a tarefa
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
 
-        // 2. Validação de Segurança: O utilizador é dono ou do time do dashboard desta tarefa?
+        // Validação de Segurança
         validateAccess(task, userId);
 
         // Busca a etiqueta
@@ -187,7 +187,7 @@ public class TaskService {
         TaskGroup newGroup = taskGroupRepository.findById(newGroupId)
             .orElseThrow(() -> new EntityNotFoundException("Grupo de tarefas não encontrado."));
 
-        // VALIDAÇÃO DE ESCOPO: O novo grupo pertence ao dashboard da tarefa?
+        // VALIDAÇÃO DE ESCOPO: O novo grupo pertence ao dashboard da tarefa
         if (!newGroup.getDashboard().getId().equals(task.getDashboard().getId())) {
             throw new IllegalArgumentException("O grupo de destino deve pertencer ao mesmo dashboard da tarefa.");
         }
@@ -202,7 +202,7 @@ public class TaskService {
         TaskGroup group = taskGroupRepository.findById(taskGroupId)
             .orElseThrow(() -> new EntityNotFoundException("Grupo de tarefas não encontrado."));
 
-        // Validação de segurança: o grupo pertence a um dashboard do usuário?
+        // Validação de segurança
         validateAccess(group.getDashboard(), userId);
 
         List<Task> tasks = taskRepository.findByTaskGroupId(taskGroupId);
@@ -221,7 +221,7 @@ public class TaskService {
         return taskMapper.toResponseDTO(task);
     }
 
-    // Validação de segurança: o usuário é o dono do dashboard da tarefa?
+    // Validação de segurança: o usuário é o dono do dashboard da tarefa
     private void validateOwner(Task task, Long userId) throws AccessDeniedException {
         if (!task.getDashboard().getUser().getId().equals(userId)) {
             throw new AccessDeniedException();
@@ -229,10 +229,10 @@ public class TaskService {
     }
 
     private void validateAccess(Dashboard dashboard, Long userId) throws AccessDeniedException {
-        // 1. Verifica se é o dono
+        // Verifica se é o dono
         boolean isOwner = dashboard.getUser().getId().equals(userId);
         
-        // 2. Verifica se está no time (Set<User> team)
+        // Verifica se está no time
         boolean isMember = dashboard.getTeam() != null && dashboard.getTeam().stream()
             .anyMatch(u -> u.getId().equals(userId));
 
@@ -242,10 +242,10 @@ public class TaskService {
     }
 
     private void validateAccess(Task task, Long userId) throws AccessDeniedException {
-        // 1. Verifica se é o dono
+        // Verifica se é o dono
         boolean isOwner = task.getDashboard().getUser().getId().equals(userId);
         
-        // 2. Verifica se está no time (Set<User> team)
+        // Verifica se está no time
         boolean isMember = task.getDashboard().getTeam() != null && task.getDashboard().getTeam().stream()
             .anyMatch(u -> u.getId().equals(userId));
 

@@ -62,13 +62,13 @@ public class TaskGroupController {
      * Atualiza o título de uma coluna.
      * Apenas o PROPRIETÁRIO pode renomear colunas.
      */
-    @PatchMapping("/{taskGroupId}")
+    @PutMapping("/{taskGroupId}")
     public ResponseEntity<TaskGroupResponseDTO> update(
             @PathVariable Long taskGroupId,
-            @RequestParam String title,
+            @RequestBody @Valid TaskGroupCreateDTO dto,
             @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException {
         
-        TaskGroupResponseDTO response = taskGroupService.update(userDetails.getUser().getId(), taskGroupId, title);
+        TaskGroupResponseDTO response = taskGroupService.update(userDetails.getUser().getId(), taskGroupId, dto.getTitle());
         return ResponseEntity.ok(response);
     }
 

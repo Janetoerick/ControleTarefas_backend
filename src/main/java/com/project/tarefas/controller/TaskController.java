@@ -139,7 +139,6 @@ public class TaskController {
 
     /**
      * Lista todas as tarefas de um grupo
-     * @throws Throwable 
      * @throws AccessDeniedException 
      */
     @GetMapping("/group/{taskGroupId}")
