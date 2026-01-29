@@ -76,7 +76,7 @@ public class DashboardController {
         return dashboardService.editTitle(
             dashboardId, 
             userId, 
-            request.getTitle()
+            request.title()
         );
     }
 

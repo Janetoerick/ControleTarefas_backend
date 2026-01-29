@@ -8,6 +8,9 @@ import org.mapstruct.Mapper;
 import com.project.tarefas.DTO.DashboardResponseDTO;
 import com.project.tarefas.model.Dashboard;
 import com.project.tarefas.model.Historical;
+import com.project.tarefas.model.Tag;
+import com.project.tarefas.model.Task;
+import com.project.tarefas.model.TaskGroup;
 import com.project.tarefas.model.User;
 
 @Mapper(componentModel = "spring")
@@ -25,6 +28,36 @@ public interface DashboardMapper {
         }
         return users.stream()
             .map(User::getId)
+            .collect(Collectors.toSet());
+    }
+
+    // Ensina o MapStruct a mapear o Set<Tag> para Set<Long>
+    default Set<Long> mapTagsToIds(Set<Tag> tags) {
+        if (tags == null) {
+            return null;
+        }
+        return tags.stream()
+            .map(Tag::getId)
+            .collect(Collectors.toSet());
+    }
+
+    // Ensina o MapStruct a mapear o Set<TaskGroup> para Set<Long>
+    default Set<Long> mapTaskGroupToIds(Set<TaskGroup> groups) {
+        if (groups == null) {
+            return null;
+        }
+        return groups.stream()
+            .map(TaskGroup::getId)
+            .collect(Collectors.toSet());
+    }
+
+    // Ensina o MapStruct a mapear o Set<Tag> para Set<Long>
+    default Set<Long> mapTaskToIds(Set<Task> tasks) {
+        if (tasks == null) {
+            return null;
+        }
+        return tasks.stream()
+            .map(Task::getId)
             .collect(Collectors.toSet());
     }
      

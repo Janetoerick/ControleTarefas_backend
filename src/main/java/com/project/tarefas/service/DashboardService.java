@@ -37,7 +37,7 @@ public class DashboardService {
 		User user_all = userRepository.findById(user)
 				.orElseThrow(() -> new UserNotFoundException("Usuário não encontrado..."));
 		
-		Dashboard new_dashboard = new Dashboard(dto.getTitle(), user_all);
+		Dashboard new_dashboard = new Dashboard(dto.title(), user_all);
 		
 		dashboardRepository.save(new_dashboard);
 		

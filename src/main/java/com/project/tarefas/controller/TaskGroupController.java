@@ -68,7 +68,7 @@ public class TaskGroupController {
             @RequestBody @Valid TaskGroupCreateDTO dto,
             @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException {
         
-        TaskGroupResponseDTO response = taskGroupService.update(userDetails.getUser().getId(), taskGroupId, dto.getTitle());
+        TaskGroupResponseDTO response = taskGroupService.update(userDetails.getUser().getId(), taskGroupId, dto.title());
         return ResponseEntity.ok(response);
     }
 

@@ -34,10 +34,10 @@ public class UserService {
     }
     
     public LoginResponseDTO loginUser(UserLoginDTO userLogin) throws UserNotFoundException, InvalidPasswordException {
-    	User user = userRepository.findByUsername(userLogin.getUsername())
+    	User user = userRepository.findByUsername(userLogin.username())
     			.orElseThrow(() -> new UserNotFoundException("User not exist"));
     	
-    	if (!passwordEncoder.matches(userLogin.getPassword(), user.getPassword())) {
+    	if (!passwordEncoder.matches(userLogin.password(), user.getPassword())) {
     		throw new InvalidPasswordException("Current password is incorrect");
     	}
     	
@@ -51,19 +51,19 @@ public class UserService {
     }
 
     public UserResponseDTO registerUser(UserRegistrationDTO registrationDTO) {
-        if (userRepository.existsByUsername(registrationDTO.getUsername())) {
+        if (userRepository.existsByUsername(registrationDTO.username())) {
             throw new RuntimeException("Username already exists");
         }
         
-        if (userRepository.existsByEmail(registrationDTO.getEmail())) {
+        if (userRepository.existsByEmail(registrationDTO.email())) {
             throw new RuntimeException("Email already in use");
         }
         
         User user = new User();
-        user.setUsername(registrationDTO.getUsername());
-        user.setEmail(registrationDTO.getEmail());
-        user.setName(registrationDTO.getName());
-        user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
+        user.setUsername(registrationDTO.username());
+        user.setEmail(registrationDTO.email());
+        user.setName(registrationDTO.name());
+        user.setPassword(passwordEncoder.encode(registrationDTO.password()));
         
         userRepository.save(user);
         
@@ -74,19 +74,19 @@ public class UserService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if (!passwordEncoder.matches(changeDTO.getCurrentPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(changeDTO.currentPassword(), user.getPassword())) {
             throw new InvalidPasswordException("Current password is incorrect");
         }
 
-        if (changeDTO.getNewPassword().equals(changeDTO.getCurrentPassword())) {
+        if (changeDTO.newPassword().equals(changeDTO.currentPassword())) {
             throw new InvalidPasswordException("New password must be different from current");
         }
 
-        if (!changeDTO.getNewPassword().equals(changeDTO.getConfirmation())) {
+        if (!changeDTO.newPassword().equals(changeDTO.confirmation())) {
             throw new InvalidConfirmationException("New password and confirmation don't match");
         }
 
-        String newEncodedPassword = passwordEncoder.encode(changeDTO.getNewPassword());
+        String newEncodedPassword = passwordEncoder.encode(changeDTO.newPassword());
         user.setPassword(newEncodedPassword);
         
         userRepository.save(user);

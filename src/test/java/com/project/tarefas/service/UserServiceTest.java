@@ -87,13 +87,13 @@ class UserServiceTest {
         // 1. Verifica se o resultado não é nulo
         assertNotNull(result);
         // 2. Verifica se o token está correto
-        assertEquals(MOCK_TOKEN, result.getToken());
+        assertEquals(MOCK_TOKEN, result.token());
         // 3. Verifica se os dados do usuário no DTO estão corretos
-        assertEquals(user.getUsername(), result.getUsername());
+        assertEquals(user.getUsername(), result.username());
         
         // 4. Verifica se os métodos mockados foram chamados UMA vez
-        verify(userRepository, times(1)).findByUsername(userLoginDTO.getUsername());
-        verify(passwordEncoder, times(1)).matches(userLoginDTO.getPassword(), ENCODED_PASSWORD);
+        verify(userRepository, times(1)).findByUsername(userLoginDTO.username());
+        verify(passwordEncoder, times(1)).matches(userLoginDTO.password(), ENCODED_PASSWORD);
         verify(jwtService, times(1)).generateToken(user);
     }
     
@@ -147,7 +147,7 @@ class UserServiceTest {
         // 1. Simula a busca do usuário
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         // 2. Simula que a senha atual está correta
-        when(passwordEncoder.matches(passwordChangeDTO.getCurrentPassword(), user.getPassword())).thenReturn(true);
+        when(passwordEncoder.matches(passwordChangeDTO.currentPassword(), user.getPassword())).thenReturn(true);
         // 3. Simula a codificação da nova senha
         when(passwordEncoder.encode(NEW_PASSWORD)).thenReturn("newHashedPassword456");
 
@@ -184,7 +184,7 @@ class UserServiceTest {
         Long userId = 1L;
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         // Simula que a senha atual fornecida está errada
-        when(passwordEncoder.matches(passwordChangeDTO.getCurrentPassword(), user.getPassword())).thenReturn(false);
+        when(passwordEncoder.matches(passwordChangeDTO.currentPassword(), user.getPassword())).thenReturn(false);
 
         // ACT & ASSERT
         assertThrows(InvalidPasswordException.class, () -> {
@@ -203,7 +203,7 @@ class UserServiceTest {
         Long userId = 1L;
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         // Simula que a senha atual está correta para chegar na próxima validação
-        when(passwordEncoder.matches(passwordChangeDTO.getCurrentPassword(), user.getPassword())).thenReturn(true);
+        when(passwordEncoder.matches(passwordChangeDTO.currentPassword(), user.getPassword())).thenReturn(true);
 
         // Cria um DTO com confirmação errada APENAS para este teste
         PasswordChangeDTO mismatchDTO = new PasswordChangeDTO(
@@ -240,7 +240,7 @@ class UserServiceTest {
 
         // ASSERT
         assertNotNull(result);
-        assertEquals(userId, result.getId());
+        assertEquals(userId, result.id());
         verify(userRepository, times(1)).findById(userId);
     }
 

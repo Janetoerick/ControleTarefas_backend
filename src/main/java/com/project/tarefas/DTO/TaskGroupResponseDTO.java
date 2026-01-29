@@ -33,7 +33,5 @@ public class TaskGroupResponseDTO {
     public void setDashboardId(Long dashboardId) {
         this.dashboardId = dashboardId;
     }
-
-
     
 }

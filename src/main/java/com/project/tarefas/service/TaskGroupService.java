@@ -42,7 +42,7 @@ public class TaskGroupService {
         validateStrictOwner(dashboard, userId);
 
         TaskGroup group = new TaskGroup();
-        group.setTitle(dto.getTitle());
+        group.setTitle(dto.title());
         group.setDashboard(dashboard);
 
         return taskGroupMapper.toResponseDTO(taskGroupRepository.save(group));
