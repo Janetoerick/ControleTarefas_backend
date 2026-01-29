@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.tarefas.DTO.TaskCreateDTO;
+import com.project.tarefas.DTO.TaskPriorityDTO;
 import com.project.tarefas.DTO.TaskResponseDTO;
+import com.project.tarefas.DTO.TaskStatusDTO;
 import com.project.tarefas.config.security.SecurityUserDetails;
 import com.project.tarefas.exception.AccessDeniedException;
 import com.project.tarefas.exception.DashboardNotFoundException;
@@ -72,10 +74,10 @@ public class TaskController {
     @PatchMapping("/{taskId}/status")
     public ResponseEntity<TaskResponseDTO> updateStatus(
             @PathVariable Long taskId,
-            @RequestParam String status,
+            @RequestBody TaskStatusDTO statusDTO,
             @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException {
         
-        TaskResponseDTO response = taskService.updateTaskStatus(userDetails.getUser().getId(), taskId, status);
+        TaskResponseDTO response = taskService.updateTaskStatus(userDetails.getUser().getId(), taskId, statusDTO.status());
         return ResponseEntity.ok(response);
     }
 
@@ -87,10 +89,10 @@ public class TaskController {
     @PatchMapping("/{taskId}/priority")
     public ResponseEntity<TaskResponseDTO> updatePriority(
             @PathVariable Long taskId,
-            @RequestParam String priority,
+            @RequestBody TaskPriorityDTO taskPriorityDTO,
             @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException {
         
-        TaskResponseDTO response = taskService.updateTaskPriority(userDetails.getUser().getId(), taskId, priority);
+        TaskResponseDTO response = taskService.updateTaskPriority(userDetails.getUser().getId(), taskId, taskPriorityDTO.priority());
         return ResponseEntity.ok(response);
     }
 
@@ -120,7 +122,7 @@ public class TaskController {
             @PathVariable Long taskId,
             @PathVariable Long tagId,
             @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException, TagNotFoundException, DashboardNotFoundException {
-        // Implementaremos este no Service a seguir, se desejar
+        
         return ResponseEntity.ok(taskService.removeTagFromTask(userDetails.getUser().getId(), taskId, tagId));
     }
 
