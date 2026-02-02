@@ -27,6 +27,8 @@ public class Historical {
 	@OneToMany(mappedBy = "historical", fetch = FetchType.LAZY)
 	private Set<Action> actions;
 
+	public Historical() {}
+
 	public Historical(Dashboard dashboard) {
 		super();
 		this.dashboard = dashboard;

@@ -1,7 +1,9 @@
 package com.project.tarefas.model;
 
 import java.sql.Time;
-import java.util.Date;
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,9 +23,8 @@ public class Action {
 	
 	private String description;
 	
-	private Date date;
-	
-	private Time time;
+	@CreationTimestamp
+	private LocalDateTime timestamp;
 	
 	@ManyToOne
 	@JoinColumn(name = "user_id")
@@ -33,11 +34,10 @@ public class Action {
 	@JoinColumn(name = "historical_id")
 	private Historical historical;
 	
-	public Action(String description, Date date, Time time, User user, Historical historical) {
+	public Action(String description, LocalDateTime timestamp, User user, Historical historical) {
 		super();
 		this.description = description;
-		this.date = date;
-		this.time = time;
+		this.timestamp = timestamp;
 		this.user = user;
 		this.historical = historical;
 	}
@@ -58,20 +58,12 @@ public class Action {
 		this.description = description;
 	}
 
-	public Date getDate() {
-		return date;
+	public LocalDateTime getTimestamp() {
+		return timestamp;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
-	public Time getTime() {
-		return time;
-	}
-
-	public void setTime(Time time) {
-		this.time = time;
+	public void setTimestamp(LocalDateTime timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	public User getUser() {
