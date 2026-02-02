@@ -12,6 +12,7 @@ import com.project.tarefas.DTO.TaskCreateDTO;
 import com.project.tarefas.DTO.TaskResponseDTO;
 import com.project.tarefas.exception.AccessDeniedException;
 import com.project.tarefas.exception.DashboardNotFoundException;
+import com.project.tarefas.exception.ResourceNotFoundException;
 import com.project.tarefas.exception.TagNotFoundException;
 import com.project.tarefas.exception.TaskNotFoundException;
 import com.project.tarefas.mapper.TaskMapper;
@@ -27,6 +28,7 @@ import com.project.tarefas.repository.TaskGroupRepository;
 import com.project.tarefas.repository.TaskRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class TaskService {
@@ -36,19 +38,22 @@ public class TaskService {
     private TagRepository tagRepository;
     private DashboardRepository dashboardRepository;
     private TaskMapper taskMapper;
+    private final ActionService actionService;
 
     public TaskService(TaskRepository taskRepository, TaskGroupRepository taskGroupRepository,
-            TagRepository tagRepository, DashboardRepository dashboardRepository, TaskMapper taskMapper) {
+            TagRepository tagRepository, DashboardRepository dashboardRepository, TaskMapper taskMapper,
+            ActionService actionService) {
         this.taskRepository = taskRepository;
         this.taskGroupRepository = taskGroupRepository;
         this.tagRepository = tagRepository;
         this.dashboardRepository = dashboardRepository;
         this.taskMapper = taskMapper;
+        this.actionService = actionService;
     }
 
 
     // Método para criar uma Task
-    public TaskResponseDTO createTask(Long userId, Long dashboardId, TaskCreateDTO dto) throws DashboardNotFoundException, AccessDeniedException {
+    public TaskResponseDTO createTask(Long userId, Long dashboardId, TaskCreateDTO dto) throws DashboardNotFoundException, AccessDeniedException, ResourceNotFoundException {
         // Validar Dashboard
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
             .orElseThrow(() -> new DashboardNotFoundException("Dashboard não encontrado."));
@@ -81,13 +86,16 @@ public class TaskService {
             task.setPriority(Priority.valueOf(dto.priority().toUpperCase()));
         }
 
-        // Salvar e Mapear para Resposta
         Task savedTask = taskRepository.save(task);
+
+        // Registro no Histórico
+        actionService.recordAction(dashboardId, userId, "Criou a tarefa: " + savedTask.getTitle());
+        
         return taskMapper.toResponseDTO(savedTask);
     }
 
     // Método para adicionar uma Tag na Task
-    public TaskResponseDTO addTagToTask(Long userId, Long taskId, Long tagId) throws TaskNotFoundException, AccessDeniedException, TagNotFoundException, DashboardNotFoundException {
+    public TaskResponseDTO addTagToTask(Long userId, Long taskId, Long tagId) throws TaskNotFoundException, AccessDeniedException, TagNotFoundException, DashboardNotFoundException, ResourceNotFoundException {
         // Busca a tarefa
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
@@ -106,11 +114,17 @@ public class TaskService {
 
         // Adiciona e salva
         task.getTags().add(tag);
-        return taskMapper.toResponseDTO(taskRepository.save(task));
+        Task savedTask = taskRepository.save(task);
+
+        // Registro no Histórico
+        actionService.recordAction(savedTask.getDashboard().getId(), userId, 
+            "Adicionou a etiqueta '" + tag.getLabel() + "' à tarefa '" + savedTask.getTitle() + "'");
+
+        return taskMapper.toResponseDTO(savedTask);
     }
 
     // Método para exlucir uma Tag da Task
-    public TaskResponseDTO removeTagFromTask(Long userId, Long taskId, Long tagId) throws TaskNotFoundException, TagNotFoundException, AccessDeniedException, DashboardNotFoundException {
+    public TaskResponseDTO removeTagFromTask(Long userId, Long taskId, Long tagId) throws TaskNotFoundException, TagNotFoundException, AccessDeniedException, DashboardNotFoundException, ResourceNotFoundException {
         // Busca a tarefa
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
@@ -129,26 +143,39 @@ public class TaskService {
             throw new IllegalArgumentException("Esta etiqueta não está associada a esta tarefa.");
         }
 
-        return taskMapper.toResponseDTO(taskRepository.save(task));
+        Task savedTask = taskRepository.save(task);
+
+        // Registro no Histórico
+        actionService.recordAction(savedTask.getDashboard().getId(), userId, 
+            "Remove a etiqueta '" + tag.getLabel() + "' à tarefa '" + savedTask.getTitle() + "'");
+
+        return taskMapper.toResponseDTO(taskRepository.save(savedTask));
     }
 
     // Método para excluir uma Task
-    public void deleteTask(Long userId, Long taskId) throws TaskNotFoundException, AccessDeniedException {
+    public void deleteTask(Long userId, Long taskId) throws TaskNotFoundException, AccessDeniedException, ResourceNotFoundException {
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
 
         // Verifica se o dono do dashboard que esta tentando excluir
         validateOwner(task, userId);
 
+        String taskTitle = task.getTitle();
+        Long dashboardId = task.getDashboard().getId();
+
         taskRepository.delete(task);
+
+        actionService.recordAction(dashboardId, userId, "Excluiu a tarefa: " + taskTitle);
     }
 
     // Método para atualizar apenas o STATUS
-    public TaskResponseDTO updateTaskStatus(Long userId, Long taskId, String statusName) throws TaskNotFoundException, AccessDeniedException {
+    @Transactional
+    public TaskResponseDTO updateTaskStatus(Long userId, Long taskId, String statusName) throws TaskNotFoundException, AccessDeniedException, ResourceNotFoundException {
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
         
         validateAccess(task, userId);
+        StatusTask oldStatus = task.getStatus();
 
         try {
             task.setStatus(StatusTask.valueOf(statusName.toUpperCase()));
@@ -156,15 +183,22 @@ public class TaskService {
             throw new IllegalArgumentException("Status inválido: " + statusName);
         }
 
-        return taskMapper.toResponseDTO(taskRepository.save(task));
+        Task updatedTask = taskRepository.save(task);
+
+        // Registro no Histórico
+        actionService.recordAction(updatedTask.getDashboard().getId(), userId, 
+            "Alterou o status da tarefa '" + updatedTask.getTitle() + "' de " + oldStatus + " para " + statusName.toUpperCase());
+
+        return taskMapper.toResponseDTO(updatedTask);
     }
 
     // Método para atualizar apenas a PRIORIDADE
-    public TaskResponseDTO updateTaskPriority(Long userId, Long taskId, String priorityName) throws TaskNotFoundException, AccessDeniedException {
+    public TaskResponseDTO updateTaskPriority(Long userId, Long taskId, String priorityName) throws TaskNotFoundException, AccessDeniedException, ResourceNotFoundException {
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
         
         validateAccess(task, userId);
+        Priority oldPriority = task.getPriority();
 
         try {
             task.setPriority(Priority.valueOf(priorityName.toUpperCase()));
@@ -172,16 +206,23 @@ public class TaskService {
             throw new IllegalArgumentException("Prioridade inválida: " + priorityName);
         }
 
-        return taskMapper.toResponseDTO(taskRepository.save(task));
+        Task updatedTask = taskRepository.save(task);
+
+        // Registro no Histórico
+        actionService.recordAction(updatedTask.getDashboard().getId(), userId, 
+            "Alterou a prioridade da tarefa '" + updatedTask.getTitle() + "' de " + oldPriority + " para " + priorityName.toUpperCase());
+
+        return taskMapper.toResponseDTO(updatedTask);
     }
 
     // Método para mover uma Task para outro grupo
-    public TaskResponseDTO moveTaskToGroup(Long userId, Long taskId, Long newGroupId) throws TaskNotFoundException, AccessDeniedException {
+    public TaskResponseDTO moveTaskToGroup(Long userId, Long taskId, Long newGroupId) throws TaskNotFoundException, AccessDeniedException, ResourceNotFoundException {
         // Busca a tarefa e valida o dono
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
         
         validateAccess(task, userId);
+        String oldGroup = task.getTaskGroup().getTitle();
 
         // Busca o novo grupo
         TaskGroup newGroup = taskGroupRepository.findById(newGroupId)
@@ -194,7 +235,13 @@ public class TaskService {
 
         task.setTaskGroup(newGroup);
 
-        return taskMapper.toResponseDTO(taskRepository.save(task));
+        Task updatedTask = taskRepository.save(task);
+
+        // Registro no Histórico
+        actionService.recordAction(updatedTask.getDashboard().getId(), userId, 
+            "Alterou o grupo da tarefa '" + updatedTask.getTitle() + "' de " + oldGroup + " para " + newGroup);
+
+        return taskMapper.toResponseDTO(updatedTask);
     }
 
     // Método para atualizar apenas a PRIORIDADE

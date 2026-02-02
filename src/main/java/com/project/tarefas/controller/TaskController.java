@@ -24,6 +24,7 @@ import com.project.tarefas.DTO.TaskStatusDTO;
 import com.project.tarefas.config.security.SecurityUserDetails;
 import com.project.tarefas.exception.AccessDeniedException;
 import com.project.tarefas.exception.DashboardNotFoundException;
+import com.project.tarefas.exception.ResourceNotFoundException;
 import com.project.tarefas.exception.TagNotFoundException;
 import com.project.tarefas.exception.TaskNotFoundException;
 import com.project.tarefas.model.User;
@@ -42,12 +43,13 @@ public class TaskController {
      * Criar uma nova tarefa.
      * @throws DashboardNotFoundException 
      * @throws AccessDeniedException 
+     * @throws ResourceNotFoundException 
      */
     @PostMapping("/dashboard/{dashboardId}")
     public ResponseEntity<TaskResponseDTO> create(
             @PathVariable Long dashboardId,
             @RequestBody @Valid TaskCreateDTO taskCreateDTO,
-            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, DashboardNotFoundException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, DashboardNotFoundException, ResourceNotFoundException {
         
         TaskResponseDTO response = taskService.createTask(userDetails.getUser().getId(), dashboardId, taskCreateDTO);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -57,11 +59,12 @@ public class TaskController {
      * Deletar uma tarefa.
      * @throws TaskNotFoundException 
      * @throws AccessDeniedException 
+     * @throws ResourceNotFoundException 
      */
     @DeleteMapping("/{taskId}")
     public ResponseEntity<Void> delete(
             @PathVariable Long taskId,
-            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException, ResourceNotFoundException {
         taskService.deleteTask(userDetails.getUser().getId(), taskId);
         return ResponseEntity.noContent().build();
     }
@@ -70,12 +73,13 @@ public class TaskController {
      * Atualizar apenas o Status da tarefa (A_FAZER, EM_ANDAMENTO, CONCLUIDA).
      * @throws TaskNotFoundException 
      * @throws AccessDeniedException 
+     * @throws ResourceNotFoundException 
      */
     @PatchMapping("/{taskId}/status")
     public ResponseEntity<TaskResponseDTO> updateStatus(
             @PathVariable Long taskId,
             @RequestBody TaskStatusDTO statusDTO,
-            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException, ResourceNotFoundException {
         
         TaskResponseDTO response = taskService.updateTaskStatus(userDetails.getUser().getId(), taskId, statusDTO.status());
         return ResponseEntity.ok(response);
@@ -85,12 +89,13 @@ public class TaskController {
      * Atualizar apenas a Prioridade da tarefa (BAIXA, MEDIA, ALTA).
      * @throws TaskNotFoundException 
      * @throws AccessDeniedException 
+     * @throws ResourceNotFoundException 
      */
     @PatchMapping("/{taskId}/priority")
     public ResponseEntity<TaskResponseDTO> updatePriority(
             @PathVariable Long taskId,
             @RequestBody TaskPriorityDTO taskPriorityDTO,
-            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException, ResourceNotFoundException {
         
         TaskResponseDTO response = taskService.updateTaskPriority(userDetails.getUser().getId(), taskId, taskPriorityDTO.priority());
         return ResponseEntity.ok(response);
@@ -100,13 +105,15 @@ public class TaskController {
      * Adiciona a tag na tarefa
      * @throws TaskNotFoundException 
      * @throws AccessDeniedException 
+     * @throws TagNotFoundException
      * @throws DashboardNotFoundException 
+     * @throws ResourceNotFoundException 
      */
     @PostMapping("/{taskId}/tags/{tagId}")
     public ResponseEntity<TaskResponseDTO> addTag(
             @PathVariable Long taskId,
             @PathVariable Long tagId,
-            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException, TagNotFoundException, DashboardNotFoundException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException, TagNotFoundException, DashboardNotFoundException, ResourceNotFoundException {
         return ResponseEntity.ok(taskService.addTagToTask(userDetails.getUser().getId(), taskId, tagId));
     }
 
@@ -116,12 +123,13 @@ public class TaskController {
      * @throws TaskNotFoundException 
      * @throws AccessDeniedException 
      * @throws DashboardNotFoundException 
+     * @throws ResourceNotFoundException 
      */
     @DeleteMapping("/{taskId}/tags/{tagId}")
     public ResponseEntity<TaskResponseDTO> removeTag(
             @PathVariable Long taskId,
             @PathVariable Long tagId,
-            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException, TagNotFoundException, DashboardNotFoundException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, TaskNotFoundException, TagNotFoundException, DashboardNotFoundException, ResourceNotFoundException {
         
         return ResponseEntity.ok(taskService.removeTagFromTask(userDetails.getUser().getId(), taskId, tagId));
     }

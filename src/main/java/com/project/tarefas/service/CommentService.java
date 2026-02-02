@@ -24,11 +24,13 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final TaskRepository taskRepository;
     private final CommentMapper commentMapper;
+    private final ActionService actionService;
 
-    public CommentService(CommentRepository commentRepository, TaskRepository taskRepository, CommentMapper commentMapper) {
+    public CommentService(CommentRepository commentRepository, TaskRepository taskRepository, CommentMapper commentMapper, ActionService actionService) {
         this.commentRepository = commentRepository;
         this.taskRepository = taskRepository;
         this.commentMapper = commentMapper;
+        this.actionService = actionService;
     }
 
     @Transactional
@@ -49,6 +51,13 @@ public class CommentService {
         comment.setUser(author);
 
         Comment saved = commentRepository.save(comment);
+
+        // Registo no Histórico
+        actionService.recordAction(
+            task.getDashboard().getId(), 
+            userId, 
+            "Adicionou um comentário na tarefa: " + task.getTitle()
+        );
         
         return commentMapper.toResponseDTO(saved);
     }
@@ -72,15 +81,25 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comentário não encontrado"));
 
+        Dashboard dashboard = comment.getTask().getDashboard();
+
         // Regra: Apenas o autor do comentário ou o dono do Dashboard pode deletar
         boolean isAuthor = comment.getUser().getId().equals(userId);
-        boolean isDashboardOwner = comment.getTask().getDashboard().getUser().getId().equals(userId);
+        boolean isDashboardOwner = dashboard.getUser().getId().equals(userId);
 
         if (!isAuthor && !isDashboardOwner) {
             throw new AccessDeniedException();
         }
 
+        String taskTitle = comment.getTask().getTitle();
         commentRepository.delete(comment);
+
+        // Registo no Histórico
+        actionService.recordAction(
+            dashboard.getId(), 
+            userId, 
+            "Eliminou um comentário da tarefa: " + taskTitle
+        );
     }
 
     // --- Métodos Auxiliares ---
