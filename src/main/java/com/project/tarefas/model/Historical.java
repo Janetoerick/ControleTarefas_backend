@@ -2,6 +2,7 @@ package com.project.tarefas.model;
 
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -24,7 +25,7 @@ public class Historical {
     @JoinColumn(name = "dashboard_id", referencedColumnName = "id")
 	private Dashboard dashboard;
 	
-	@OneToMany(mappedBy = "historical", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "historical", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private Set<Action> actions;
 
 	public Historical() {}

@@ -26,17 +26,17 @@ public class Dashboard {
 	
 	private String title;
 	
-	@OneToMany(mappedBy = "dashboard", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "dashboard", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	private Set<Task> tasks;
 
-	@OneToMany(mappedBy = "dashboard", orphanRemoval = true)
+	@OneToMany(mappedBy = "dashboard", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Tag> tags;
 	
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User user;
 	
-	@OneToMany(mappedBy = "dashboard")
+	@OneToMany(mappedBy = "dashboard", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<TaskGroup> taskgroups;
 	
 	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
@@ -45,7 +45,7 @@ public class Dashboard {
 	inverseJoinColumns = @JoinColumn(name = "user_id"))
 	private Set<User> team = new java.util.HashSet<>();
 	
-	@OneToOne(mappedBy = "dashboard", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+	@OneToOne(mappedBy = "dashboard", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false, orphanRemoval = true)
     private Historical historical;
 	
 	public Dashboard() {

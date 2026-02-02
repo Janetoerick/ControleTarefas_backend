@@ -47,7 +47,7 @@ public class Task {
 	inverseJoinColumns = @JoinColumn(name = "tag_id"))
 	private Set<Tag> tags;
 	
-	@OneToMany(mappedBy = "task", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Comment> comments;
 	
 	@ManyToOne(optional = false)
