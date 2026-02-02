@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,9 +22,11 @@ public class Action {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 	
+	@Column(nullable = false, columnDefinition = "TEXT")
 	private String description;
 	
 	@CreationTimestamp
+	@Column(name = "timestamp", nullable = false, updatable = false)
 	private LocalDateTime timestamp;
 	
 	@ManyToOne
@@ -33,11 +36,12 @@ public class Action {
 	@ManyToOne
 	@JoinColumn(name = "historical_id")
 	private Historical historical;
-	
-	public Action(String description, LocalDateTime timestamp, User user, Historical historical) {
-		super();
+
+	public Action() {
+	}
+
+	public Action(String description, User user, Historical historical) {
 		this.description = description;
-		this.timestamp = timestamp;
 		this.user = user;
 		this.historical = historical;
 	}
