@@ -19,10 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.project.tarefas.DTO.DashboardResponseDTO;
 import com.project.tarefas.DTO.DashboardTitleDTO;
 import com.project.tarefas.DTO.TagResponseDTO;
+import com.project.tarefas.DTO.TaskGroupResponseDTO;
 import com.project.tarefas.config.security.SecurityUserDetails;
-import com.project.tarefas.exception.AccessDeniedException;
-import com.project.tarefas.exception.DashboardNotFoundException;
-import com.project.tarefas.exception.UserNotFoundException;
 import com.project.tarefas.service.DashboardService;
 
 @RestController
@@ -38,12 +36,11 @@ public class DashboardController {
 	
 	/**
      * Cria um novo dashboard.
-     * @throws UserNotFoundException 
      */
 	@PostMapping("/user/{userId}")
     public ResponseEntity<DashboardResponseDTO> createDashboard(
         @PathVariable Long userId,
-        @RequestBody DashboardTitleDTO request) throws UserNotFoundException {
+        @RequestBody DashboardTitleDTO request) {
         
         DashboardResponseDTO response = dashboardService.createDashboard(userId, request);
         
@@ -52,30 +49,26 @@ public class DashboardController {
 	
 	/**
      * Deleta um dashboard.
-     * @throws AccessDeniedException 
-	 * @throws DashboardNotFoundException 
      */
 	@DeleteMapping("/user/{userId}/{dashboardId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)  // Retorna 204 para exclusão bem-sucedida
 	public void deleteDashboard(
 			@PathVariable Long userId,
 			@PathVariable Long dashboardId
-			) throws AccessDeniedException, DashboardNotFoundException {
+			) {
 		
 		dashboardService.deleteDashboard(userId, dashboardId);
 	}
 	
 	/**
      * Edita o titulo de um dashboard.
-     * @throws AccessDeniedException 
-	 * @throws DashboardNotFoundException 
      */
 	@PatchMapping("/user/{userId}/{dashboardId}/title")
 	public DashboardResponseDTO editDashboardTitle(
 	        @PathVariable Long userId, 
 	        @PathVariable Long dashboardId,
 	        @RequestBody DashboardTitleDTO request
-			) throws AccessDeniedException, DashboardNotFoundException {
+			) {
 	
         return dashboardService.editTitle(
             dashboardId, 
@@ -86,43 +79,50 @@ public class DashboardController {
 
 	/**
      * Acha um dashboard pelo id.
-	 * @throws DashboardNotFoundException 
      */
 	@GetMapping("/{id}")
 	public DashboardResponseDTO findDashboardById(
-			@PathVariable Long id
-			) throws DashboardNotFoundException {
+			@PathVariable Long id) {
 		
 		return dashboardService.findDashboardById(id);
 	}
 	
 	/**
      * Acha todos os dashboards com o id do criador.
-     * @throws UserNotFoundException 
      */
 	@GetMapping("/user/{userId}")
 	public Set<DashboardResponseDTO> findDashboardByUserId(
-			@PathVariable Long userId
-			) throws UserNotFoundException {
+			@PathVariable Long userId) {
 		
 		return dashboardService.findAllDashboardByUser(userId);
 	}
 	
 	/**
      * Lista todas as Tags disponiveis no escopo do Dashboard
-     * @throws ResourceNotFoundException 
-     * @throws AccessDeniedException 
      */
     @GetMapping("/{dashboardId}/tags")
     public ResponseEntity<List<TagResponseDTO>> listTagsByDashboard(
             @AuthenticationPrincipal SecurityUserDetails userDetails,
-            @PathVariable Long dashboardId) throws DashboardNotFoundException, AccessDeniedException {
+            @PathVariable Long dashboardId) {
         
         List<TagResponseDTO> tags = dashboardService.listDashboardTags(
             userDetails.getUser().getId(), 
             dashboardId
         );
         return ResponseEntity.ok(tags);
+    }
+    
+    /**
+     * Lista todas as colunas de um Dashboard.
+     * Tanto o PROPRIETÁRIO quanto os membros do TIME podem visualizar.
+     */
+    @GetMapping("/{dashboardId}")
+    public ResponseEntity<List<TaskGroupResponseDTO>> list(
+            @PathVariable Long dashboardId,
+            @AuthenticationPrincipal SecurityUserDetails userDetails)  {
+        
+        List<TaskGroupResponseDTO> response = dashboardService.listTaskGroups(userDetails.getUser().getId(), dashboardId);
+        return ResponseEntity.ok(response);
     }
 	
 	

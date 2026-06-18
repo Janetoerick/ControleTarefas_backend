@@ -13,8 +13,6 @@ import com.project.tarefas.DTO.TaskGroupCreateDTO;
 import com.project.tarefas.DTO.TaskGroupResponseDTO;
 import com.project.tarefas.DTO.TaskResponseDTO;
 import com.project.tarefas.config.security.SecurityUserDetails;
-import com.project.tarefas.exception.AccessDeniedException;
-import com.project.tarefas.exception.DashboardNotFoundException;
 import com.project.tarefas.service.TaskGroupService;
 
 
@@ -31,42 +29,24 @@ public class TaskGroupController {
     /**
      * Cria uma nova coluna no Dashboard.
      * Apenas o PROPRIETÁRIO do dashboard pode realizar esta ação.
-     * @throws AccessDeniedException 
-     * @throws DashboardNotFoundException
      */
     @PostMapping("/dashboard/{dashboardId}")
     public ResponseEntity<TaskGroupResponseDTO> create(
             @PathVariable Long dashboardId,
             @RequestBody @Valid TaskGroupCreateDTO dto,
-            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, DashboardNotFoundException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) {
         
         TaskGroupResponseDTO response = taskGroupService.create(userDetails.getUser().getId(), dashboardId, dto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-
-    /**
-     * Lista todas as colunas de um Dashboard.
-     * Tanto o PROPRIETÁRIO quanto os membros do TIME podem visualizar.
-     * @throws AccessDeniedException 
-     * @throws DashboardNotFoundException 
-     */
-    @GetMapping("/dashboard/{dashboardId}")
-    public ResponseEntity<List<TaskGroupResponseDTO>> list(
-            @PathVariable Long dashboardId,
-            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException, DashboardNotFoundException {
-        
-        List<TaskGroupResponseDTO> response = taskGroupService.listByDashboard(userDetails.getUser().getId(), dashboardId);
-        return ResponseEntity.ok(response);
-    }
     
     /**
      * Lista todas as tarefas de um grupo
-     * @throws AccessDeniedException 
      */
-    @GetMapping("/group/{taskGroupId}")
+    @GetMapping("/tasks/{taskGroupId}")
     public ResponseEntity<List<TaskResponseDTO>> getByGroup(
             @PathVariable Long taskGroupId,
-            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) {
         return ResponseEntity.ok(taskGroupService.getTasksByGroup(userDetails.getUser().getId(), taskGroupId));
     }
 
@@ -78,7 +58,7 @@ public class TaskGroupController {
     public ResponseEntity<TaskGroupResponseDTO> update(
             @PathVariable Long taskGroupId,
             @RequestBody @Valid TaskGroupCreateDTO dto,
-            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) {
         
         TaskGroupResponseDTO response = taskGroupService.update(userDetails.getUser().getId(), taskGroupId, dto.title());
         return ResponseEntity.ok(response);
@@ -91,7 +71,7 @@ public class TaskGroupController {
     @DeleteMapping("/{taskGroupId}")
     public ResponseEntity<Void> delete(
             @PathVariable Long taskGroupId,
-            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException {
+            @AuthenticationPrincipal SecurityUserDetails userDetails) {
         
         taskGroupService.delete(userDetails.getUser().getId(), taskGroupId);
         return ResponseEntity.noContent().build();

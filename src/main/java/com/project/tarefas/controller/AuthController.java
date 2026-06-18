@@ -10,8 +10,6 @@ import com.project.tarefas.DTO.LoginResponseDTO;
 import com.project.tarefas.DTO.UserLoginDTO;
 import com.project.tarefas.DTO.UserRegistrationDTO;
 import com.project.tarefas.DTO.UserResponseDTO;
-import com.project.tarefas.exception.InvalidPasswordException;
-import com.project.tarefas.exception.UserNotFoundException;
 import com.project.tarefas.service.UserService;
 
 @RestController
@@ -31,7 +29,7 @@ private final UserService userService;
     }
     
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> loginUser(@RequestBody UserLoginDTO loginDTO) throws UserNotFoundException, InvalidPasswordException {
+    public ResponseEntity<LoginResponseDTO> loginUser(@RequestBody UserLoginDTO loginDTO) {
     	LoginResponseDTO response = userService.loginUser(loginDTO);
     	return ResponseEntity.ok(response);
     }

@@ -39,6 +39,7 @@ class TaskGroupServiceTest {
     @Mock private TaskGroupMapper taskGroupMapper;
 
     @InjectMocks private TaskGroupService taskGroupService;
+    @InjectMocks private DashboardService dashboardService;
 
     private User owner;
     private User teamMember;
@@ -103,7 +104,7 @@ class TaskGroupServiceTest {
         when(dashboardRepository.findById(10L)).thenReturn(Optional.of(dashboard));
         when(taskGroupRepository.findByDashboardId(10L)).thenReturn(List.of(taskGroup));
 
-        List<TaskGroupResponseDTO> result = taskGroupService.listByDashboard(1L, 10L);
+        List<TaskGroupResponseDTO> result = dashboardService.listTaskGroups(1L, 10L);
         assertNotNull(result);
     }
 
@@ -114,14 +115,14 @@ class TaskGroupServiceTest {
         when(taskGroupRepository.findByDashboardId(10L)).thenReturn(List.of(taskGroup));
 
         // Usuário 2L é membro do time
-        assertDoesNotThrow(() -> taskGroupService.listByDashboard(2L, 10L));
+        assertDoesNotThrow(() -> dashboardService.listTaskGroups(2L, 10L));
     }
 
     @Test
     @DisplayName("Deve negar listagem para usuário intruso (não é dono nem time)")
     void list_FailIntruder() {
         when(dashboardRepository.findById(10L)).thenReturn(Optional.of(dashboard));
-        assertThrows(AccessDeniedException.class, () -> taskGroupService.listByDashboard(3L, 10L));
+        assertThrows(AccessDeniedException.class, () -> dashboardService.listTaskGroups(3L, 10L));
     }
 
     // =================================================================

@@ -11,8 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.project.tarefas.exception.UserNotFoundException;
 import com.project.tarefas.mapper.DashboardMapper;
 import com.project.tarefas.mapper.TagMapper;
+import com.project.tarefas.mapper.TaskGroupMapper;
 import com.project.tarefas.DTO.DashboardTitleDTO;
 import com.project.tarefas.DTO.TagResponseDTO;
+import com.project.tarefas.DTO.TaskGroupResponseDTO;
 import com.project.tarefas.DTO.DashboardResponseDTO;
 import com.project.tarefas.exception.AccessDeniedException;
 import com.project.tarefas.exception.DashboardNotFoundException;
@@ -28,18 +30,20 @@ public class DashboardService {
 	private final UserRepository userRepository;
 	private final DashboardMapper dashboardMapper;
 	private final TagMapper tagMapper;
+	private final TaskGroupMapper taskGroupMapper;
 
 	public DashboardService(DashboardRepository dashboardRepository, UserRepository userRepository
-			, DashboardMapper dashboardMapper, TagMapper tagMapper) {
+			, DashboardMapper dashboardMapper, TagMapper tagMapper, TaskGroupMapper taskGroupMapper) {
 		super();
 		this.dashboardRepository = dashboardRepository;
 		this.userRepository = userRepository;
 		this.dashboardMapper = dashboardMapper;
 		this.tagMapper = tagMapper;
+		this.taskGroupMapper = taskGroupMapper;
 	}
 	
 	// Cria um novo Dashboard
-	public DashboardResponseDTO createDashboard(Long user, DashboardTitleDTO dto) throws UserNotFoundException {
+	public DashboardResponseDTO createDashboard(Long user, DashboardTitleDTO dto) {
 		
 		User user_all = userRepository.findById(user)
 				.orElseThrow(() -> new UserNotFoundException("Usuário não encontrado..."));
@@ -52,7 +56,7 @@ public class DashboardService {
 	}
 	
 	// Deleta um novo Dashboard
-	public void deleteDashboard(Long user, Long dashboard) throws AccessDeniedException, DashboardNotFoundException {
+	public void deleteDashboard(Long user, Long dashboard) {
 		
 		Dashboard dashboard_all = dashboardRepository.findById(dashboard)
 				.orElseThrow(() -> new DashboardNotFoundException("Dashboard não existe..."));
@@ -65,7 +69,7 @@ public class DashboardService {
 	}
 	
 	// Modifica o titulo de um Dashboard existente
-	public DashboardResponseDTO editTitle(Long dashboard, Long user, String title) throws AccessDeniedException, DashboardNotFoundException {
+	public DashboardResponseDTO editTitle(Long dashboard, Long user, String title) {
 		
 		Dashboard dashboard_edit = dashboardRepository.findById(dashboard)
 				.orElseThrow(() -> new DashboardNotFoundException("Dashboard não existe..."));
@@ -81,7 +85,7 @@ public class DashboardService {
 	}
 	
 	// Retorna um Todas as informacoes de um Dashboard de acordo com o Id
-	public DashboardResponseDTO findDashboardById(Long id) throws DashboardNotFoundException {
+	public DashboardResponseDTO findDashboardById(Long id) {
 		Dashboard dashboard = dashboardRepository.findById(id)
 				.orElseThrow(() -> new DashboardNotFoundException("Dashboard não existe..."));
 		
@@ -89,7 +93,7 @@ public class DashboardService {
 	}
 	
 	// Retorna todos os Dashboards que o usuario id seja dono
-	public Set<DashboardResponseDTO> findAllDashboardByUser(Long id) throws UserNotFoundException  {
+	public Set<DashboardResponseDTO> findAllDashboardByUser(Long id)  {
 		
 		User user_all = userRepository.findById(id)
 				.orElseThrow(() -> new UserNotFoundException("Usuário não encontrado..."));
@@ -105,7 +109,7 @@ public class DashboardService {
 	
 	// Lista todas as Tags do Dashboard -> DONO e EQUIPE
     @Transactional(readOnly = true)
-    public List<TagResponseDTO> listDashboardTags(Long userId, Long dashboardId) throws AccessDeniedException, DashboardNotFoundException {
+    public List<TagResponseDTO> listDashboardTags(Long userId, Long dashboardId) {
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
                 .orElseThrow(() -> new DashboardNotFoundException("Dashboard não existe..."));
         
@@ -117,8 +121,21 @@ public class DashboardService {
                 .collect(Collectors.toList());
     }
     
+ // Lista grupos de tarefas
+    public List<TaskGroupResponseDTO> listTaskGroups(Long userId, Long dashboardId) {
+        Dashboard dashboard = dashboardRepository.findById(dashboardId)
+                .orElseThrow(() -> new DashboardNotFoundException("Dashboard não existe..."));
+
+        // Para listar, usamos a regra do TaskService: Dono OU Time
+        validateDashboardAccess(dashboard, userId);
+
+        return dashboard.getTaskgroups().stream()
+                .map(taskGroupMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+    
  // Verifica se pertence ao Dashboard (Dono ou Equipe)
-    private void validateDashboardAccess(Dashboard dashboard, Long userId) throws AccessDeniedException {
+    private void validateDashboardAccess(Dashboard dashboard, Long userId) {
         boolean isOwner = dashboard.getUser().getId().equals(userId);
         boolean isMember = dashboard.getTeam() != null && 
                            dashboard.getTeam().stream().anyMatch(u -> u.getId().equals(userId));

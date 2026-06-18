@@ -25,7 +25,7 @@ public class HistoricalService {
 
     // Método de mostragem/recuperação
     @Transactional(readOnly = true)
-    public Historical findByDashboard(Long dashboardId) throws ResourceNotFoundException {
+    public Historical findByDashboard(Long dashboardId) {
         return historicalRepository.findByDashboardId(dashboardId)
             .orElseThrow(() -> new ResourceNotFoundException("Histórico não encontrado"));
     }

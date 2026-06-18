@@ -70,7 +70,7 @@ public class UserService {
         return userMapper.toResponseDTO(user);
     }
     
-    public void changePassword(Long userId, PasswordChangeDTO changeDTO) throws UserNotFoundException, InvalidPasswordException, InvalidConfirmationException {
+    public void changePassword(Long userId, PasswordChangeDTO changeDTO) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException("User not found"));
 
@@ -92,7 +92,7 @@ public class UserService {
         userRepository.save(user);
     }
     
-    public UserResponseDTO findUserById(Long id) throws UserNotFoundException {
+    public UserResponseDTO findUserById(Long id) {
     	User user = userRepository.findById(id)
     			.orElseThrow(() -> new UserNotFoundException("User not exist"));
     	

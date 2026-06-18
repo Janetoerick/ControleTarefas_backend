@@ -40,7 +40,7 @@ public class TaskGroupService {
     }
 
     // Cria uma nova coluna. Apenas o DONO do dashboard pode fazer isso.
-    public TaskGroupResponseDTO create(Long userId, Long dashboardId, TaskGroupCreateDTO dto) throws AccessDeniedException, DashboardNotFoundException {
+    public TaskGroupResponseDTO create(Long userId, Long dashboardId, TaskGroupCreateDTO dto) {
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
                 .orElseThrow(() -> new DashboardNotFoundException("Dashboard não encontrado."));
 
@@ -53,23 +53,9 @@ public class TaskGroupService {
 
         return taskGroupMapper.toResponseDTO(taskGroupRepository.save(group));
     }
-
-
-    // Lista grupos. Aqui permitimos que o TIME veja, caso contrário não conseguiriam ver as tarefas.
-    public List<TaskGroupResponseDTO> listByDashboard(Long userId, Long dashboardId) throws AccessDeniedException, DashboardNotFoundException {
-        Dashboard dashboard = dashboardRepository.findById(dashboardId)
-                .orElseThrow(() -> new DashboardNotFoundException("Dashboard não encontrado."));
-
-        // Para listar, usamos a regra do TaskService: Dono OU Time
-        validateAccessForView(dashboard, userId);
-
-        return taskGroupRepository.findByDashboardId(dashboardId).stream()
-                .map(taskGroupMapper::toResponseDTO)
-                .collect(Collectors.toList());
-    }
     
     // Lista todas as tasks do groupTask
-    public List<TaskResponseDTO> getTasksByGroup(Long userId, Long taskGroupId) throws AccessDeniedException {
+    public List<TaskResponseDTO> getTasksByGroup(Long userId, Long taskGroupId) {
         TaskGroup group = taskGroupRepository.findById(taskGroupId)
             .orElseThrow(() -> new EntityNotFoundException("Grupo de tarefas não encontrado."));
 
@@ -83,7 +69,7 @@ public class TaskGroupService {
     }
 
     // Atualiza o nome da coluna. Apenas o DONO.
-    public TaskGroupResponseDTO update(Long userId, Long taskGroupId, String newName) throws AccessDeniedException {
+    public TaskGroupResponseDTO update(Long userId, Long taskGroupId, String newName) {
         TaskGroup group = taskGroupRepository.findById(taskGroupId)
                 .orElseThrow(() -> new EntityNotFoundException("Grupo não encontrado."));
 
@@ -105,13 +91,13 @@ public class TaskGroupService {
 
     // --- VALIDAÇÕES DE SEGURANÇA ---
 
-    private void validateStrictOwner(Dashboard dashboard, Long userId) throws AccessDeniedException {
+    private void validateStrictOwner(Dashboard dashboard, Long userId) {
         if (!dashboard.getUser().getId().equals(userId)) {
             throw new AccessDeniedException();
         }
     }
 
-    private void validateAccessForView(Dashboard dashboard, Long userId) throws AccessDeniedException {
+    private void validateAccessForView(Dashboard dashboard, Long userId) {
         boolean isOwner = dashboard.getUser().getId().equals(userId);
         
         // Proteção contra NullPointerException

@@ -3,8 +3,6 @@ package com.project.tarefas.controller;
 import com.project.tarefas.DTO.CommentCreateDTO;
 import com.project.tarefas.DTO.CommentResponseDTO;
 import com.project.tarefas.config.security.SecurityUserDetails;
-import com.project.tarefas.exception.AccessDeniedException;
-import com.project.tarefas.exception.ResourceNotFoundException;
 import com.project.tarefas.service.CommentService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -26,14 +24,12 @@ public class CommentController {
 
     /**
      * Cria um comentário para uma tarefa específica
-     * @throws ResourceNotFoundException 
-     * @throws AccessDeniedException 
      */
     @PostMapping("/task/{taskId}")
     public ResponseEntity<CommentResponseDTO> create(
             @AuthenticationPrincipal SecurityUserDetails userDetails,
             @PathVariable Long taskId,
-            @RequestBody @Valid CommentCreateDTO dto) throws ResourceNotFoundException, AccessDeniedException {
+            @RequestBody @Valid CommentCreateDTO dto) {
         
         CommentResponseDTO response = commentService.addComment(
                 userDetails.getUser().getId(), 
@@ -45,13 +41,11 @@ public class CommentController {
 
     /**
      * Lista todos os comentários de uma tarefa
-     * @throws ResourceNotFoundException 
-     * @throws AccessDeniedException 
      */
     @GetMapping("/task/{taskId}")
     public ResponseEntity<List<CommentResponseDTO>> listByTask(
             @AuthenticationPrincipal SecurityUserDetails userDetails,
-            @PathVariable Long taskId) throws ResourceNotFoundException, AccessDeniedException {
+            @PathVariable Long taskId) {
         
         List<CommentResponseDTO> comments = commentService.listCommentsByTask(
                 userDetails.getUser().getId(), 
@@ -62,13 +56,11 @@ public class CommentController {
 
     /**
      * Deleta um comentário
-     * @throws ResourceNotFoundException 
-     * @throws AccessDeniedException 
      */
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> delete(
             @AuthenticationPrincipal SecurityUserDetails userDetails,
-            @PathVariable Long commentId) throws AccessDeniedException, ResourceNotFoundException {
+            @PathVariable Long commentId) {
         
         commentService.deleteComment(userDetails.getUser().getId(), commentId);
         return ResponseEntity.noContent().build();

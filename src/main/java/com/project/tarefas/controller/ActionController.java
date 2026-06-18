@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.tarefas.DTO.ActionResponseDTO;
 import com.project.tarefas.config.security.SecurityUserDetails;
-import com.project.tarefas.exception.AccessDeniedException;
-import com.project.tarefas.exception.ResourceNotFoundException;
 import com.project.tarefas.service.ActionService;
 
 @RestController
@@ -30,7 +28,7 @@ public class ActionController {
     public ResponseEntity<Page<ActionResponseDTO>> getHistory(
             @PathVariable Long dashboardId,
             @AuthenticationPrincipal SecurityUserDetails userDetails,
-            @PageableDefault(size = 20) Pageable pageable) throws ResourceNotFoundException, AccessDeniedException {
+            @PageableDefault(size = 20) Pageable pageable) {
         
         return ResponseEntity.ok(actionService.getHistoryByDashboard(
             dashboardId, 

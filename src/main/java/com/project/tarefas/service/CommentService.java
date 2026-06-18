@@ -34,7 +34,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponseDTO addComment(Long userId, Long taskId, CommentCreateDTO dto) throws ResourceNotFoundException, AccessDeniedException {
+    public CommentResponseDTO addComment(Long userId, Long taskId, CommentCreateDTO dto) {
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
@@ -63,7 +63,7 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public List<CommentResponseDTO> listCommentsByTask(Long userId, Long taskId) throws ResourceNotFoundException, AccessDeniedException {
+    public List<CommentResponseDTO> listCommentsByTask(Long userId, Long taskId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
 
@@ -77,7 +77,7 @@ public class CommentService {
     }
 
     @Transactional
-    public void deleteComment(Long userId, Long commentId) throws AccessDeniedException, ResourceNotFoundException {
+    public void deleteComment(Long userId, Long commentId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comentário não encontrado"));
 
@@ -104,7 +104,7 @@ public class CommentService {
 
     // --- Métodos Auxiliares ---
 
-    private void validateDashboardAccess(Dashboard dashboard, Long userId) throws AccessDeniedException {
+    private void validateDashboardAccess(Dashboard dashboard, Long userId) {
         boolean isOwner = dashboard.getUser().getId().equals(userId);
         boolean isMember = dashboard.getTeam() != null && 
                            dashboard.getTeam().stream().anyMatch(u -> u.getId().equals(userId));

@@ -34,7 +34,7 @@ public class TagService {
 
     // Cria a Tag para poder ser usada no escopo do Dashboard -> Apenas DONO
     @Transactional
-    public TagResponseDTO createTag(Long userId, Long dashboardId, TagCreateDTO dto) throws AccessDeniedException, ResourceNotFoundException {
+    public TagResponseDTO createTag(Long userId, Long dashboardId, TagCreateDTO dto) {
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
                 .orElseThrow(() -> new ResourceNotFoundException("Dashboard não encontrado"));
 
@@ -46,7 +46,7 @@ public class TagService {
 
     // Edita a Tag -> Apenas DONO
     @Transactional
-    public TagResponseDTO updateTag(Long userId, Long tagId, TagCreateDTO dto) throws AccessDeniedException, ResourceNotFoundException {
+    public TagResponseDTO updateTag(Long userId, Long tagId, TagCreateDTO dto) {
         Tag tag = tagRepository.findById(tagId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tag não encontrada"));
 
@@ -60,7 +60,7 @@ public class TagService {
 
     // Deleta uma Tag do Dashboard -> Apenas DONO
     @Transactional
-    public void deleteTag(Long userId, Long tagId) throws AccessDeniedException, ResourceNotFoundException {
+    public void deleteTag(Long userId, Long tagId) {
         Tag tag = tagRepository.findById(tagId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tag não encontrada"));
 
@@ -76,14 +76,14 @@ public class TagService {
     // --- MÉTODOS DE VALIDAÇÃO REUTILIZÁVEIS ---
 
     // Verifica se é o dono (Restrito)
-    private void validateStrictOwner(Dashboard dashboard, Long userId) throws AccessDeniedException {
+    private void validateStrictOwner(Dashboard dashboard, Long userId) {
         if (!dashboard.getUser().getId().equals(userId)) {
             throw new AccessDeniedException();
         }
     }
 
     // Verifica se pertence ao Dashboard (Dono ou Equipe)
-    private void validateDashboardAccess(Dashboard dashboard, Long userId) throws AccessDeniedException {
+    private void validateDashboardAccess(Dashboard dashboard, Long userId) {
         boolean isOwner = dashboard.getUser().getId().equals(userId);
         boolean isMember = dashboard.getTeam() != null && 
                            dashboard.getTeam().stream().anyMatch(u -> u.getId().equals(userId));

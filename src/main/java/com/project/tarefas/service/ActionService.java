@@ -25,7 +25,7 @@ public class ActionService {
     }
 
     @Transactional
-    public void recordAction(Long dashboardId, Long userId, String message) throws ResourceNotFoundException {
+    public void recordAction(Long dashboardId, Long userId, String message) {
         Historical historical = historicalRepository.findByDashboardId(dashboardId)
             .orElseThrow(() -> new ResourceNotFoundException("Histórico não encontrado para este Dashboard"));
 
@@ -37,7 +37,7 @@ public class ActionService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ActionResponseDTO> getHistoryByDashboard(Long dashboardId, Long userId, Pageable pageable) throws ResourceNotFoundException, AccessDeniedException {
+    public Page<ActionResponseDTO> getHistoryByDashboard(Long dashboardId, Long userId, Pageable pageable) {
         Historical historical = historicalRepository.findByDashboardId(dashboardId)
             .orElseThrow(() -> new ResourceNotFoundException("Histórico não encontrado"));
 

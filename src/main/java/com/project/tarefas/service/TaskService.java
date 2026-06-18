@@ -53,7 +53,7 @@ public class TaskService {
 
 
     // Método para criar uma Task
-    public TaskResponseDTO createTask(Long userId, Long dashboardId, TaskCreateDTO dto) throws DashboardNotFoundException, AccessDeniedException, ResourceNotFoundException {
+    public TaskResponseDTO createTask(Long userId, Long dashboardId, TaskCreateDTO dto) {
         // Validar Dashboard
         Dashboard dashboard = dashboardRepository.findById(dashboardId)
             .orElseThrow(() -> new DashboardNotFoundException("Dashboard não encontrado."));
@@ -95,7 +95,7 @@ public class TaskService {
     }
 
     // Método para adicionar uma Tag na Task
-    public TaskResponseDTO addTagToTask(Long userId, Long taskId, Long tagId) throws TaskNotFoundException, AccessDeniedException, TagNotFoundException, DashboardNotFoundException, ResourceNotFoundException {
+    public TaskResponseDTO addTagToTask(Long userId, Long taskId, Long tagId) {
         // Busca a tarefa
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
@@ -124,7 +124,7 @@ public class TaskService {
     }
 
     // Método para exlucir uma Tag da Task
-    public TaskResponseDTO removeTagFromTask(Long userId, Long taskId, Long tagId) throws TaskNotFoundException, TagNotFoundException, AccessDeniedException, DashboardNotFoundException, ResourceNotFoundException {
+    public TaskResponseDTO removeTagFromTask(Long userId, Long taskId, Long tagId) {
         // Busca a tarefa
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
@@ -153,7 +153,7 @@ public class TaskService {
     }
 
     // Método para excluir uma Task
-    public void deleteTask(Long userId, Long taskId) throws TaskNotFoundException, AccessDeniedException, ResourceNotFoundException {
+    public void deleteTask(Long userId, Long taskId) {
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
 
@@ -170,7 +170,7 @@ public class TaskService {
 
     // Método para atualizar apenas o STATUS
     @Transactional
-    public TaskResponseDTO updateTaskStatus(Long userId, Long taskId, String statusName) throws TaskNotFoundException, AccessDeniedException, ResourceNotFoundException {
+    public TaskResponseDTO updateTaskStatus(Long userId, Long taskId, String statusName) {
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
         
@@ -193,7 +193,7 @@ public class TaskService {
     }
 
     // Método para atualizar apenas a PRIORIDADE
-    public TaskResponseDTO updateTaskPriority(Long userId, Long taskId, String priorityName) throws TaskNotFoundException, AccessDeniedException, ResourceNotFoundException {
+    public TaskResponseDTO updateTaskPriority(Long userId, Long taskId, String priorityName) {
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
         
@@ -216,7 +216,7 @@ public class TaskService {
     }
 
     // Método para mover uma Task para outro grupo
-    public TaskResponseDTO moveTaskToGroup(Long userId, Long taskId, Long newGroupId) throws TaskNotFoundException, AccessDeniedException, ResourceNotFoundException {
+    public TaskResponseDTO moveTaskToGroup(Long userId, Long taskId, Long newGroupId)  {
         // Busca a tarefa e valida o dono
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
@@ -244,7 +244,7 @@ public class TaskService {
         return taskMapper.toResponseDTO(updatedTask);
     }
 
-    public TaskResponseDTO getTaskById(Long userId, Long taskId) throws TaskNotFoundException, AccessDeniedException {
+    public TaskResponseDTO getTaskById(Long userId, Long taskId) {
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());
 
@@ -255,13 +255,13 @@ public class TaskService {
     }
 
     // Validação de segurança: o usuário é o dono do dashboard da tarefa
-    private void validateOwner(Task task, Long userId) throws AccessDeniedException {
+    private void validateOwner(Task task, Long userId) {
         if (!task.getDashboard().getUser().getId().equals(userId)) {
             throw new AccessDeniedException();
         }
     }
 
-    private void validateAccess(Dashboard dashboard, Long userId) throws AccessDeniedException {
+    private void validateAccess(Dashboard dashboard, Long userId) {
         // Verifica se é o dono
         boolean isOwner = dashboard.getUser().getId().equals(userId);
         
@@ -274,7 +274,7 @@ public class TaskService {
         }
     }
 
-    private void validateAccess(Task task, Long userId) throws AccessDeniedException {
+    private void validateAccess(Task task, Long userId) {
         // Verifica se é o dono
         boolean isOwner = task.getDashboard().getUser().getId().equals(userId);
         
