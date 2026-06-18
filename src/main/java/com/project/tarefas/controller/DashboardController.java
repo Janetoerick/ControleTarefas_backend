@@ -1,9 +1,11 @@
 package com.project.tarefas.controller;
 
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.tarefas.DTO.DashboardResponseDTO;
 import com.project.tarefas.DTO.DashboardTitleDTO;
+import com.project.tarefas.DTO.TagResponseDTO;
+import com.project.tarefas.config.security.SecurityUserDetails;
 import com.project.tarefas.exception.AccessDeniedException;
 import com.project.tarefas.exception.DashboardNotFoundException;
 import com.project.tarefas.exception.UserNotFoundException;
@@ -103,6 +107,23 @@ public class DashboardController {
 		
 		return dashboardService.findAllDashboardByUser(userId);
 	}
+	
+	/**
+     * Lista todas as Tags disponiveis no escopo do Dashboard
+     * @throws ResourceNotFoundException 
+     * @throws AccessDeniedException 
+     */
+    @GetMapping("/{dashboardId}/tags")
+    public ResponseEntity<List<TagResponseDTO>> listTagsByDashboard(
+            @AuthenticationPrincipal SecurityUserDetails userDetails,
+            @PathVariable Long dashboardId) throws DashboardNotFoundException, AccessDeniedException {
+        
+        List<TagResponseDTO> tags = dashboardService.listDashboardTags(
+            userDetails.getUser().getId(), 
+            dashboardId
+        );
+        return ResponseEntity.ok(tags);
+    }
 	
 	
 }

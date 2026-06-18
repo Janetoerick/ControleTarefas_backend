@@ -2,16 +2,11 @@ package com.project.tarefas.mapper;
 
 import com.project.tarefas.DTO.TagResponseDTO;
 import com.project.tarefas.model.Tag;
-import org.springframework.stereotype.Component;
 
-@Component
-public class TagMapper {
+import org.mapstruct.Mapper;
 
-    public TagResponseDTO toResponseDTO(Tag tag) {
-        return new TagResponseDTO(
-            tag.getId(),
-            tag.getLabel(),
-            tag.getColor()
-        );
-    }
+@Mapper(componentModel = "spring")
+public interface TagMapper {
+
+    TagResponseDTO toResponseDTO(Tag tag);
 }

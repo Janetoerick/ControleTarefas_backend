@@ -72,22 +72,6 @@ public class TagController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Lista todas as Tags disponiveis no escopo de um Dashboard
-     * @throws ResourceNotFoundException 
-     * @throws AccessDeniedException 
-     */
-    @GetMapping("/dashboard/{dashboardId}")
-    public ResponseEntity<List<TagResponseDTO>> listByDashboard(
-            @AuthenticationPrincipal SecurityUserDetails userDetails,
-            @PathVariable Long dashboardId) throws ResourceNotFoundException, AccessDeniedException {
-        
-        List<TagResponseDTO> tags = tagService.listDashboardTags(
-            userDetails.getUser().getId(), 
-            dashboardId
-        );
-        return ResponseEntity.ok(tags);
-    }
 
     /**
      * Deleta uma Tag do escopo do Dashboard

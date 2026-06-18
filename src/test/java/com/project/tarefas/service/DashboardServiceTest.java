@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -26,8 +27,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.project.tarefas.DTO.DashboardResponseDTO;
 import com.project.tarefas.DTO.DashboardTitleDTO;
+import com.project.tarefas.DTO.TagResponseDTO;
 import com.project.tarefas.exception.AccessDeniedException;
 import com.project.tarefas.exception.DashboardNotFoundException;
+import com.project.tarefas.exception.ResourceNotFoundException;
 import com.project.tarefas.exception.UserNotFoundException;
 import com.project.tarefas.mapper.DashboardMapper;
 import com.project.tarefas.model.Dashboard;

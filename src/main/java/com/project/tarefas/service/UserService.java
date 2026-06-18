@@ -23,7 +23,7 @@ public class UserService {
 	
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
     private JwtService jwtService;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper, JwtService jwtService) {

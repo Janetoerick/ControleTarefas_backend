@@ -1,14 +1,18 @@
 package com.project.tarefas.service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.tarefas.exception.UserNotFoundException;
 import com.project.tarefas.mapper.DashboardMapper;
-//import com.project.tarefas.mapper.DashboardMapper;
+import com.project.tarefas.mapper.TagMapper;
 import com.project.tarefas.DTO.DashboardTitleDTO;
+import com.project.tarefas.DTO.TagResponseDTO;
 import com.project.tarefas.DTO.DashboardResponseDTO;
 import com.project.tarefas.exception.AccessDeniedException;
 import com.project.tarefas.exception.DashboardNotFoundException;
@@ -22,13 +26,16 @@ public class DashboardService {
 
 	private final DashboardRepository dashboardRepository;
 	private final UserRepository userRepository;
-	private DashboardMapper dashboardMapper;
+	private final DashboardMapper dashboardMapper;
+	private final TagMapper tagMapper;
 
-	public DashboardService(DashboardRepository dashboardRepository, UserRepository userRepository, DashboardMapper dashboardMapper) {
+	public DashboardService(DashboardRepository dashboardRepository, UserRepository userRepository
+			, DashboardMapper dashboardMapper, TagMapper tagMapper) {
 		super();
 		this.dashboardRepository = dashboardRepository;
 		this.userRepository = userRepository;
 		this.dashboardMapper = dashboardMapper;
+		this.tagMapper = tagMapper;
 	}
 	
 	// Cria um novo Dashboard
@@ -95,5 +102,30 @@ public class DashboardService {
 		
 		return dashboardMapper.toResponseAllDTO(dashboards);
 	}
+	
+	// Lista todas as Tags do Dashboard -> DONO e EQUIPE
+    @Transactional(readOnly = true)
+    public List<TagResponseDTO> listDashboardTags(Long userId, Long dashboardId) throws AccessDeniedException, DashboardNotFoundException {
+        Dashboard dashboard = dashboardRepository.findById(dashboardId)
+                .orElseThrow(() -> new DashboardNotFoundException("Dashboard não existe..."));
+        
+        validateDashboardAccess(dashboard, userId);
+        
+        return dashboard.getTags()
+                .stream()
+                .map(tagMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+    
+ // Verifica se pertence ao Dashboard (Dono ou Equipe)
+    private void validateDashboardAccess(Dashboard dashboard, Long userId) throws AccessDeniedException {
+        boolean isOwner = dashboard.getUser().getId().equals(userId);
+        boolean isMember = dashboard.getTeam() != null && 
+                           dashboard.getTeam().stream().anyMatch(u -> u.getId().equals(userId));
+
+        if (!isOwner && !isMember) {
+            throw new AccessDeniedException();
+        }
+    }
 	
 }

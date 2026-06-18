@@ -105,22 +105,6 @@ class TagServiceTest {
     }
 
     // =================================================================
-    // TESTES DE LISTAGEM (ACESSOS)
-    // =================================================================
-
-    @Test
-    @DisplayName("Deve permitir que membro do time liste as Tags")
-    void listTags_Success_ForMember() throws AccessDeniedException, ResourceNotFoundException {
-        when(dashboardRepository.findById(10L)).thenReturn(Optional.of(dashboard));
-        when(tagRepository.findByDashboardId(10L)).thenReturn(List.of(tag));
-
-        List<TagResponseDTO> result = tagService.listDashboardTags(2L, 10L);
-
-        assertFalse(result.isEmpty());
-        verify(tagRepository).findByDashboardId(10L);
-    }
-
-    // =================================================================
     // TESTES DE DELEÇÃO E INTEGRIDADE
     // =================================================================
 

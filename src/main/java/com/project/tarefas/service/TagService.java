@@ -58,20 +58,6 @@ public class TagService {
         return tagMapper.toResponseDTO(tagRepository.save(tag));
     }
 
-    // Lista todas as Tags do Dashboard -> DONO e EQUIPE
-    @Transactional(readOnly = true)
-    public List<TagResponseDTO> listDashboardTags(Long userId, Long dashboardId) throws AccessDeniedException, ResourceNotFoundException {
-        Dashboard dashboard = dashboardRepository.findById(dashboardId)
-                .orElseThrow(() -> new ResourceNotFoundException("Dashboard não encontrado"));
-        
-        validateDashboardAccess(dashboard, userId);
-        
-        return tagRepository.findByDashboardId(dashboardId)
-                .stream()
-                .map(tagMapper::toResponseDTO)
-                .collect(Collectors.toList());
-    }
-
     // Deleta uma Tag do Dashboard -> Apenas DONO
     @Transactional
     public void deleteTag(Long userId, Long tagId) throws AccessDeniedException, ResourceNotFoundException {
