@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.project.tarefas.DTO.TaskGroupCreateDTO;
 import com.project.tarefas.DTO.TaskGroupResponseDTO;
+import com.project.tarefas.DTO.TaskResponseDTO;
 import com.project.tarefas.config.security.SecurityUserDetails;
 import com.project.tarefas.exception.AccessDeniedException;
 import com.project.tarefas.exception.DashboardNotFoundException;
@@ -56,6 +57,17 @@ public class TaskGroupController {
         
         List<TaskGroupResponseDTO> response = taskGroupService.listByDashboard(userDetails.getUser().getId(), dashboardId);
         return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Lista todas as tarefas de um grupo
+     * @throws AccessDeniedException 
+     */
+    @GetMapping("/group/{taskGroupId}")
+    public ResponseEntity<List<TaskResponseDTO>> getByGroup(
+            @PathVariable Long taskGroupId,
+            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException {
+        return ResponseEntity.ok(taskGroupService.getTasksByGroup(userDetails.getUser().getId(), taskGroupId));
     }
 
     /**

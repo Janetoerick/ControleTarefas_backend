@@ -48,6 +48,7 @@ public class TaskServiceTest {
     @Mock private TaskMapper taskMapper;
 
     @InjectMocks private TaskService taskService;
+    @InjectMocks private TaskGroupService taskGroupService;
 
     private User user;
     private Dashboard dashboard;
@@ -191,7 +192,7 @@ public class TaskServiceTest {
             when(taskGroupRepository.findById(20L)).thenReturn(Optional.of(taskGroup));
             when(taskRepository.findByTaskGroupId(20L)).thenReturn(List.of(task));
 
-            List<TaskResponseDTO> result = taskService.getTasksByGroup(1L, 20L);
+            List<TaskResponseDTO> result = taskGroupService.getTasksByGroup(1L, 20L);
 
             assertEquals(1, result.size());
         }

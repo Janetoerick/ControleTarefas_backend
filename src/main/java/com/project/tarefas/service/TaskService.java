@@ -244,20 +244,6 @@ public class TaskService {
         return taskMapper.toResponseDTO(updatedTask);
     }
 
-    // Método para atualizar apenas a PRIORIDADE
-    public List<TaskResponseDTO> getTasksByGroup(Long userId, Long taskGroupId) throws AccessDeniedException {
-        TaskGroup group = taskGroupRepository.findById(taskGroupId)
-            .orElseThrow(() -> new EntityNotFoundException("Grupo de tarefas não encontrado."));
-
-        // Validação de segurança
-        validateAccess(group.getDashboard(), userId);
-
-        List<Task> tasks = taskRepository.findByTaskGroupId(taskGroupId);
-        return tasks.stream()
-                    .map(taskMapper::toResponseDTO)
-                    .collect(Collectors.toList());
-    }
-
     public TaskResponseDTO getTaskById(Long userId, Long taskId) throws TaskNotFoundException, AccessDeniedException {
         Task task = taskRepository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException());

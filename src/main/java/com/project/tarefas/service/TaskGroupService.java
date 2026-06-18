@@ -1,17 +1,20 @@
 package com.project.tarefas.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.project.tarefas.DTO.TaskGroupCreateDTO;
 import com.project.tarefas.DTO.TaskGroupResponseDTO;
+import com.project.tarefas.DTO.TaskResponseDTO;
 import com.project.tarefas.exception.AccessDeniedException;
 import com.project.tarefas.exception.DashboardNotFoundException;
 import com.project.tarefas.mapper.TaskGroupMapper;
+import com.project.tarefas.mapper.TaskMapper;
 import com.project.tarefas.model.Dashboard;
+import com.project.tarefas.model.Task;
 import com.project.tarefas.model.TaskGroup;
 import com.project.tarefas.repository.DashboardRepository;
 import com.project.tarefas.repository.TaskGroupRepository;
@@ -24,13 +27,16 @@ public class TaskGroupService {
     private final TaskGroupRepository taskGroupRepository;
     private final DashboardRepository dashboardRepository;
     private final TaskGroupMapper taskGroupMapper;
+    private final TaskMapper taskMapper;
 
     public TaskGroupService(TaskGroupRepository taskGroupRepository, 
                             DashboardRepository dashboardRepository, 
-                            TaskGroupMapper taskGroupMapper) {
+                            TaskGroupMapper taskGroupMapper,
+                            TaskMapper taskMapper) {
         this.taskGroupRepository = taskGroupRepository;
         this.dashboardRepository = dashboardRepository;
         this.taskGroupMapper = taskGroupMapper;
+        this.taskMapper = taskMapper;
     }
 
     // Cria uma nova coluna. Apenas o DONO do dashboard pode fazer isso.
@@ -60,6 +66,20 @@ public class TaskGroupService {
         return taskGroupRepository.findByDashboardId(dashboardId).stream()
                 .map(taskGroupMapper::toResponseDTO)
                 .collect(Collectors.toList());
+    }
+    
+    // Lista todas as tasks do groupTask
+    public List<TaskResponseDTO> getTasksByGroup(Long userId, Long taskGroupId) throws AccessDeniedException {
+        TaskGroup group = taskGroupRepository.findById(taskGroupId)
+            .orElseThrow(() -> new EntityNotFoundException("Grupo de tarefas não encontrado."));
+
+        // Validação de segurança
+        validateAccessForView(group.getDashboard(), userId);
+
+        List<Task> tasks = new ArrayList<>(group.getTasks());
+        return tasks.stream()
+                    .map(taskMapper::toResponseDTO)
+                    .collect(Collectors.toList());
     }
 
     // Atualiza o nome da coluna. Apenas o DONO.

@@ -148,17 +148,6 @@ public class TaskController {
     }
 
     /**
-     * Lista todas as tarefas de um grupo
-     * @throws AccessDeniedException 
-     */
-    @GetMapping("/group/{taskGroupId}")
-    public ResponseEntity<List<TaskResponseDTO>> getByGroup(
-            @PathVariable Long taskGroupId,
-            @AuthenticationPrincipal SecurityUserDetails userDetails) throws AccessDeniedException {
-        return ResponseEntity.ok(taskService.getTasksByGroup(userDetails.getUser().getId(), taskGroupId));
-    }
-
-    /**
      * Ver todos os detalhes de uma tarefa
      * @throws AccessDeniedException 
      * @throws TaskNotFoundException 
