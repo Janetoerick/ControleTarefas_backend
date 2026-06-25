@@ -1,5 +1,6 @@
 package com.project.tarefas.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -39,19 +40,19 @@ public class User {
 	private String password;
 	
 	@OneToMany(mappedBy = "user")
-	private Set<Dashboard> dashboards;
+	private Set<Dashboard> dashboards = new HashSet<>();
 	
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-	private Set<Comment> comments;
+	private Set<Comment> comments = new HashSet<>();
 	
 	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
 	@JoinTable(name = "dashboard_user",
 	joinColumns = @JoinColumn(name = "user_id"),
 	inverseJoinColumns = @JoinColumn(name = "dashboard_id"))
-	private Set<Dashboard> dashboards_team;
+	private Set<Dashboard> dashboards_team = new HashSet<>();
 	
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-	private Set<Action> actions;
+	private Set<Action> actions = new HashSet<>();
 
 	public User() {
 		super();

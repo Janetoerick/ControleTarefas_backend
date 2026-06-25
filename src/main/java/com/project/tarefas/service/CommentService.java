@@ -11,10 +11,10 @@ import com.project.tarefas.model.Task;
 import com.project.tarefas.model.User;
 import com.project.tarefas.repository.CommentRepository;
 import com.project.tarefas.repository.TaskRepository;
+import com.project.tarefas.service.ActionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +24,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final TaskRepository taskRepository;
     private final CommentMapper commentMapper;
-    private final ActionService actionService;
+    private ActionService actionService;
 
     public CommentService(CommentRepository commentRepository, TaskRepository taskRepository, CommentMapper commentMapper, ActionService actionService) {
         this.commentRepository = commentRepository;

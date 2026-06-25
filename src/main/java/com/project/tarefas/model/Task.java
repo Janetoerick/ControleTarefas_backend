@@ -1,6 +1,7 @@
 package com.project.tarefas.model;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import com.project.tarefas.model.enums.Priority;
@@ -45,10 +46,10 @@ public class Task {
 	@JoinTable(name = "task_tag",
 	joinColumns = @JoinColumn(name = "task_id"),
 	inverseJoinColumns = @JoinColumn(name = "tag_id"))
-	private Set<Tag> tags;
+	private Set<Tag> tags = new HashSet<>();
 	
 	@OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<Comment> comments;
+	private Set<Comment> comments = new HashSet<>();
 	
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "taskgroup_id")

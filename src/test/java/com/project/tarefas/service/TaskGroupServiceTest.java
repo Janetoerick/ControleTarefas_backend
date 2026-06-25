@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -101,18 +102,20 @@ class TaskGroupServiceTest {
     @Test
     @DisplayName("Deve listar grupos para o dono do dashboard")
     void list_SuccessOwner() throws Exception {
+    	dashboard.setTaskgroups(new HashSet<>(Set.of(taskGroup)));
         when(dashboardRepository.findById(10L)).thenReturn(Optional.of(dashboard));
-        when(taskGroupRepository.findByDashboardId(10L)).thenReturn(List.of(taskGroup));
 
         List<TaskGroupResponseDTO> result = dashboardService.listTaskGroups(1L, 10L);
+        
         assertNotNull(result);
+        assertEquals(1, result.size());
     }
 
     @Test
     @DisplayName("Deve permitir que membros do time listem os grupos")
     void list_SuccessTeamMember() throws Exception {
+    	dashboard.setTaskgroups(new HashSet<>(Set.of(taskGroup)));
         when(dashboardRepository.findById(10L)).thenReturn(Optional.of(dashboard));
-        when(taskGroupRepository.findByDashboardId(10L)).thenReturn(List.of(taskGroup));
 
         // Usuário 2L é membro do time
         assertDoesNotThrow(() -> dashboardService.listTaskGroups(2L, 10L));

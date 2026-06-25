@@ -37,6 +37,7 @@ class CommentServiceTest {
     @Mock private TaskRepository taskRepository;
     @Mock private CommentMapper commentMapper;
 
+    @Mock private ActionService actionService;
     @InjectMocks private CommentService commentService;
 
     private User owner;

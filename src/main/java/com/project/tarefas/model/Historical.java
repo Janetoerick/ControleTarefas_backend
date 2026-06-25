@@ -1,5 +1,6 @@
 package com.project.tarefas.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
@@ -26,7 +27,7 @@ public class Historical {
 	private Dashboard dashboard;
 	
 	@OneToMany(mappedBy = "historical", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-	private Set<Action> actions;
+	private Set<Action> actions = new HashSet<>();
 
 	public Historical() {}
 

@@ -1,5 +1,6 @@
 package com.project.tarefas.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
@@ -27,23 +28,23 @@ public class Dashboard {
 	private String title;
 	
 	@OneToMany(mappedBy = "dashboard", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-	private Set<Task> tasks;
+	private Set<Task> tasks = new HashSet<>();
 
 	@OneToMany(mappedBy = "dashboard", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<Tag> tags;
+	private Set<Tag> tags = new HashSet<>();
 	
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User user;
 	
 	@OneToMany(mappedBy = "dashboard", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<TaskGroup> taskgroups;
+	private Set<TaskGroup> taskgroups = new HashSet<>();
 	
 	@ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
 	@JoinTable(name = "dashboard_user",
 	joinColumns = @JoinColumn(name = "dashboard_id"),
 	inverseJoinColumns = @JoinColumn(name = "user_id"))
-	private Set<User> team = new java.util.HashSet<>();
+	private Set<User> team = new HashSet<>();
 	
 	@OneToOne(mappedBy = "dashboard", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false, orphanRemoval = true)
     private Historical historical;

@@ -1,5 +1,6 @@
 package com.project.tarefas.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
@@ -30,7 +31,7 @@ public class Tag {
 	@JoinTable(name = "task_tag",
 	joinColumns = @JoinColumn(name = "tag_id"),
 	inverseJoinColumns = @JoinColumn(name = "task_id"))
-	private Set<Task> tasks;
+	private Set<Task> tasks = new HashSet<>();
 
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "dashboard_id")

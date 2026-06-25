@@ -1,5 +1,6 @@
 package com.project.tarefas.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
@@ -24,7 +25,7 @@ public class TaskGroup {
 	private String title;
 	
 	@OneToMany(mappedBy = "taskGroup", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private Set<Task> tasks;
+	private Set<Task> tasks = new HashSet<>();
 	
 	@ManyToOne
 	@JoinColumn(name = "dashboard_id")

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +48,7 @@ public class TaskServiceTest {
     @Mock private DashboardRepository dashboardRepository;
     @Mock private TaskMapper taskMapper;
 
+    @Mock private ActionService actionService;
     @InjectMocks private TaskService taskService;
     @InjectMocks private TaskGroupService taskGroupService;
 
@@ -64,17 +66,18 @@ public class TaskServiceTest {
         dashboard = new Dashboard();
         dashboard.setId(10L);
         dashboard.setUser(user);
-        dashboard.setTeam(new java.util.HashSet<>());
+        dashboard.setTeam(new HashSet<>());
 
         taskGroup = new TaskGroup();
         taskGroup.setId(20L);
         taskGroup.setDashboard(dashboard);
+        taskGroup.setTasks(new HashSet<>());
 
         task = new Task();
         task.setId(100L);
         task.setDashboard(dashboard);
         task.setTaskGroup(taskGroup);
-        task.setTags(new java.util.HashSet<>());
+        task.setTags(new HashSet<>());
 
         tag = new Tag();
         tag.setId(30L);
@@ -189,8 +192,10 @@ public class TaskServiceTest {
     class SearchTests {
         @Test
         void deveBuscarTasksPorGrupoComSucesso() throws Exception {
+        	
+        	taskGroup.getTasks().add(task);
+        	
             when(taskGroupRepository.findById(20L)).thenReturn(Optional.of(taskGroup));
-            when(taskRepository.findByTaskGroupId(20L)).thenReturn(List.of(task));
 
             List<TaskResponseDTO> result = taskGroupService.getTasksByGroup(1L, 20L);
 
